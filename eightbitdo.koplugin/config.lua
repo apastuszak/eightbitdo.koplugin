@@ -78,10 +78,50 @@ function Config.normalizeProfile(saved, profile)
     return result
 end
 
+-- Stored settings format (G_reader_settings key "eightbitdo_remotes"):
+--   schema   integer, Config.SCHEMA when written by this build
+--   enabled  boolean
+--   remote   "zero2" | "micro"
+--   profiles.<remote>.repeat_keys  boolean
+--   profiles.<remote>.mappings.<button id>  Config.actions key
+--   profiles.<remote>.actions.<button id>   Dispatcher action table (optional)
+-- Changing this shape requires bumping Config.SCHEMA and adding a migration
+-- for the new number. Never renumber or remove existing migrations.
+Config.SCHEMA = 1
+Config.migrations = {
+    -- Builds before 0.4.0 stored no schema field but already used this shape.
+    [1] = function(saved) return saved end,
+}
+
+-- Returns the stored schema number; missing or malformed values count as 0
+-- (written before schemas existed).
+function Config.schemaOf(saved)
+    local schema = type(saved) == "table" and saved.schema
+    if type(schema) ~= "number" or schema < 0 or schema ~= math.floor(schema) then
+        return 0
+    end
+    return schema
+end
+
+-- Settings from a newer build may hold data this build does not understand,
+-- so they are used read-only rather than downgraded on save.
+function Config.isNewer(saved)
+    return Config.schemaOf(saved) > Config.SCHEMA
+end
+
+function Config.migrate(saved)
+    saved = copy(asTable(saved))
+    for schema = Config.schemaOf(saved) + 1, Config.SCHEMA do
+        saved = Config.migrations[schema](saved)
+    end
+    return saved
+end
+
 function Config.normalize(saved)
     saved = asTable(saved)
     local profiles = asTable(saved.profiles)
     local result = {
+        schema = Config.SCHEMA,
         enabled = saved.enabled ~= false,
         remote = Config.names[saved.remote] and saved.remote or "zero2",
         profiles = {},
@@ -95,7 +135,10 @@ end
 function Config.load(saved, old_zero2, old_micro)
     -- A combined settings table always wins over legacy settings, even when
     -- disabled. Migration copies data and leaves legacy settings untouched.
-    if type(saved) == "table" then return Config.normalize(saved) end
+    if type(saved) == "table" then
+        if Config.isNewer(saved) then return Config.normalize(saved) end
+        return Config.normalize(Config.migrate(saved))
+    end
     local zero2, micro = asTable(old_zero2), asTable(old_micro)
     local zero_enabled = type(old_zero2) == "table" and zero2.enabled ~= false
     local micro_enabled = type(old_micro) == "table" and micro.enabled ~= false

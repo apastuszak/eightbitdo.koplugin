@@ -124,7 +124,7 @@ local menu = {}
 plugin:addToMainMenu(menu)
 local items = menu.eightbitdo.sub_item_table
 items[5].callback()
-assert(UIManager.last_widget.text:find("v0.3.1", 1, true), "Help identifies installed build")
+assert(UIManager.last_widget.text:find("v0.4.0", 1, true), "Help identifies installed build")
 local assignments = items[4].sub_item_table_func()
 items[3].callback() -- Enable repeat.
 local _, repeat_key = event(37, 2)
@@ -384,3 +384,63 @@ equal(saved[setting].profiles[profile].actions.up, nil, "Reset clears custom act
 equal(select(2, event(up_code)), "Up")
 equal(Config.normalizeProfile({ actions = { up = "bad" } }, profile).actions.up, nil)
 print(profile .. " PASS: full tap-corner picker, multiple actions, numeric args, private keys, sequences, reset")
+
+-- Settings schema: the stored shape is locked to Config.SCHEMA.
+equal(Config.SCHEMA, 1)
+equal(saved[setting].schema, Config.SCHEMA, "Saved settings carry the schema")
+local function keys_of(value)
+    local list = {}
+    for name in pairs(value) do list[#list + 1] = name end
+    table.sort(list)
+    return table.concat(list, ",")
+end
+local locked = Config.normalize(nil)
+equal(keys_of(locked), "enabled,profiles,remote,schema", "Top-level shape locked")
+equal(keys_of(locked.profiles), "micro,zero2", "Profile set locked")
+for _, id in ipairs(Config.order) do
+    equal(keys_of(locked.profiles[id]), "actions,mappings,repeat_keys", "Profile shape locked")
+end
+equal(keys_of(Config.normalize({ surprise = true })), "enabled,profiles,remote,schema", "Unknown fields dropped")
+equal(#Config.migrations, Config.SCHEMA, "Every schema number has a migration")
+-- Pre-schema (0.3.x) settings upgrade without loss or aliasing.
+local pre_schema = { enabled = false, remote = "micro",
+    profiles = { micro = { repeat_keys = true, mappings = { b = "Press" }, actions = { a = { night_mode = true } } } } }
+local upgraded = Config.load(pre_schema)
+equal(upgraded.schema, 1)
+equal(upgraded.enabled, false)
+equal(upgraded.remote, "micro")
+equal(upgraded.profiles.micro.mappings.b, "Press")
+equal(upgraded.profiles.micro.repeat_keys, true)
+equal(upgraded.profiles.micro.actions.a.night_mode, true)
+equal(pre_schema.schema, nil, "Migration does not modify the stored table")
+upgraded.profiles.micro.actions.a.night_mode = false
+equal(pre_schema.profiles.micro.actions.a.night_mode, true, "Migration copies actions")
+for _, malformed in ipairs({ "1", -1, 0.5, true }) do
+    equal(Config.schemaOf({ schema = malformed }), 0, "Malformed schema treated as pre-schema")
+    equal(Config.load({ schema = malformed, remote = "micro" }).remote, "micro")
+end
+equal(Config.isNewer({ schema = Config.SCHEMA }), false)
+equal(Config.isNewer({ schema = Config.SCHEMA + 1 }), true)
+
+-- A newer build's settings are used but never overwritten by this build.
+local newer = { schema = Config.SCHEMA + 1, enabled = true, remote = profile, future = { kept = true },
+    profiles = { [profile] = { mappings = { up = "LPgFwd" } } } }
+saved[setting] = newer
+hooks = {}
+Device.hasKeys, Device.hasDPad = no, no
+local save_total = saves
+Zero2 = dofile(directory .. "main.lua")
+plugin = Zero2:new{ ui = ui }
+drain()
+equal(select(2, event(up_code)), "LPgFwd", "Newer settings still applied")
+plugin:selectRemote(other)
+plugin:onFlushSettings()
+local newer_menu = {}
+plugin:addToMainMenu(newer_menu)
+newer_menu.eightbitdo.sub_item_table[5].callback()
+assert(UIManager.last_widget.text:find("newer version", 1, true), "Help explains read-only settings")
+equal(saves, save_total, "Newer settings never saved over")
+equal(saved[setting], newer)
+equal(newer.remote, profile)
+equal(newer.future.kept, true)
+print(profile .. " PASS: settings schema, migration, downgrade protection")

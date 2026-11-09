@@ -4,7 +4,7 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 ## Install or upgrade
 
-Current plugin build: **0.3.1**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.3.1.koplugin.zip`.
+Current plugin build: **0.4.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.4.0.koplugin.zip`.
 
 1. Exit KOReader. If you installed either standalone plugin, remove `koreader/plugins/zero2.koplugin` and `koreader/plugins/micro.koplugin` from the device. Keep your KOReader settings so their assignments can be imported.
 2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
@@ -21,6 +21,8 @@ Disable or remove the standalone plugins before using this package: their input 
 The menu provides a global **Enable remote mappings** toggle, a **Remote** selector, and per-remote repeat preferences and button assignments. Repeat is off by default. Resetting assignments resets only the profile whose assignments menu you opened, preserving repeat and the other profile.
 
 On first use, the plugin copies assignments and repeat preferences from `eightbitdo_zero2` and `eightbitdo_micro` into the new `eightbitdo_remotes` settings entry. Legacy settings remain untouched. Later starts use the combined settings.
+
+The settings entry carries a schema number (currently 1). Settings from earlier builds, which have no schema number, are upgraded automatically and keep all assignments. If you downgrade after a future build has saved a newer schema, this build still uses the settings it understands but does not save over them; **Help** shows a notice, and changes made in the older build are not kept.
 
 If only Micro was enabled, Micro is selected. Otherwise Zero 2 is selected, including when both old profiles were enabled. Mapping stays disabled if all installed legacy profiles were disabled. New installations default to enabled with Zero 2 selected.
 
@@ -83,7 +85,7 @@ Your operating system and KOReader's input integration must already deliver the 
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.3.1**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.4.0**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 

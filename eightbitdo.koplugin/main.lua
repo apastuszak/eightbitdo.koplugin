@@ -10,7 +10,7 @@ local directory = debug.getinfo(1, "S").source:match("^@(.*/)")
 local Config = dofile(directory .. "config.lua")
 local SETTING = "eightbitdo_remotes"
 local EV_KEY = 1
-local VERSION = "0.3.1"
+local VERSION = "0.4.0"
 local state = { capabilities = {} }
 local by_code = {}
 for profile_index, profile in ipairs(Config.order) do
@@ -80,8 +80,9 @@ end
 function Remotes:init()
     -- One state and hook for all reader/file-manager instances.
     if not state.settings then
-        state.settings = Config.load(
-            G_reader_settings:readSetting(SETTING),
+        local saved = G_reader_settings:readSetting(SETTING)
+        state.read_only = Config.isNewer(saved)
+        state.settings = Config.load(saved,
             G_reader_settings:readSetting("eightbitdo_zero2"),
             G_reader_settings:readSetting("eightbitdo_micro"))
         self:save()
@@ -107,6 +108,8 @@ function Remotes:init()
 end
 
 function Remotes:save()
+    -- Never downgrade settings written by a newer build of this plugin.
+    if state.read_only then return end
     G_reader_settings:saveSetting(SETTING, state.settings)
 end
 
@@ -294,7 +297,9 @@ function Remotes:addToMainMenu(menu_items)
                 text = _("Help"),
                 callback = function()
                     UIManager:show(InfoMessage:new{
-                        text = "8BitDo remotes v" .. VERSION .. "\n\n" .. _("Select Zero 2 or Micro under Remote. Button assignments and repeat preferences are saved separately for each remote. Switching applies immediately. Open a button to see the Gesture Manager action categories directly: General, Device, Screen and lights, File browser, Reader, and document-specific actions. Native navigation keys are in their own submenu. Multiple actions and QuickMenus are supported.\n\nConnect the remote in HID keyboard mode (K on Micro) using your device's Bluetooth tools. This plugin maps input already delivered to KOReader; it does not pair or open Bluetooth devices.\n\nDisable or remove the old standalone Zero 2 and Micro plugins, then restart KOReader. Their saved assignments are imported on first use.\n\nMappings also affect physical keyboards sending the same codes. Disable remote mappings when typing. Micro Star emits no key; Capture is configurable."),
+                        text = "8BitDo remotes v" .. VERSION .. "\n\n"
+                            .. (state.read_only and _("Settings were saved by a newer version of this plugin. Changes made with this version are not saved.") .. "\n\n" or "")
+                            .. _("Select Zero 2 or Micro under Remote. Button assignments and repeat preferences are saved separately for each remote. Switching applies immediately. Open a button to see the Gesture Manager action categories directly: General, Device, Screen and lights, File browser, Reader, and document-specific actions. Native navigation keys are in their own submenu. Multiple actions and QuickMenus are supported.\n\nConnect the remote in HID keyboard mode (K on Micro) using your device's Bluetooth tools. This plugin maps input already delivered to KOReader; it does not pair or open Bluetooth devices.\n\nDisable or remove the old standalone Zero 2 and Micro plugins, then restart KOReader. Their saved assignments are imported on first use.\n\nMappings also affect physical keyboards sending the same codes. Disable remote mappings when typing. Micro Star emits no key; Capture is configurable."),
                     })
                 end,
             },

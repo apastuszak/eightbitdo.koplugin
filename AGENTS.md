@@ -48,6 +48,11 @@ limitations honestly instead of inventing gesture coordinates.
 - Keep settings under `eightbitdo_remotes`. Preserve migration from
   `eightbitdo_zero2` and `eightbitdo_micro`, without modifying or aliasing the
   legacy settings. Existing combined settings take precedence.
+- The stored settings shape is locked by `Config.SCHEMA` (documented in
+  `config.lua`). Any change to that shape must bump `Config.SCHEMA` and add a
+  `Config.migrations[n]` step for the new number; never renumber or delete
+  existing steps. Settings with a newer schema are used read-only and must never
+  be saved over. Update the shape assertions in `tests/run.lua` with the bump.
 - Interpret codes as Linux `EV_KEY` codes, not USB HID usage IDs. Micro Star
   emits no key in the supplied profile; do not map it to key code zero.
 - Translate through private virtual codes without overwriting the original
