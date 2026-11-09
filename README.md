@@ -1,10 +1,10 @@
 # 8BitDo remotes for KOReader
 
-One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. Choose the remote in the menu; its button assignments and held-button repeat preference are saved separately and restored when switching back.
+One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. Choose the remote in the menu; its button assignments are saved separately and restored when switching back.
 
 ## Install or upgrade
 
-Current plugin build: **0.4.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.4.0.koplugin.zip`.
+Current plugin build: **0.5.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.5.0.koplugin.zip`.
 
 1. Exit KOReader. If you installed either standalone plugin, remove `koreader/plugins/zero2.koplugin` and `koreader/plugins/micro.koplugin` from the device. Keep your KOReader settings so their assignments can be imported.
 2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
@@ -18,11 +18,11 @@ Disable or remove the standalone plugins before using this package: their input 
 
 ## Settings and migration
 
-The menu provides a global **Enable remote mappings** toggle, a **Remote** selector, and per-remote repeat preferences and button assignments. Repeat is off by default. Resetting assignments resets only the profile whose assignments menu you opened, preserving repeat and the other profile.
+The menu provides a global **Enable remote mappings** toggle, a **Remote** selector, and per-remote button assignments. Resetting assignments resets only the profile whose assignments menu you opened, preserving the other profile.
 
-On first use, the plugin copies assignments and repeat preferences from `eightbitdo_zero2` and `eightbitdo_micro` into the new `eightbitdo_remotes` settings entry. Legacy settings remain untouched. Later starts use the combined settings.
+On first use, the plugin copies assignments from `eightbitdo_zero2` and `eightbitdo_micro` into the new `eightbitdo_remotes` settings entry. Legacy settings remain untouched. Later starts use the combined settings.
 
-The settings entry carries a schema number (currently 1). Settings from earlier builds, which have no schema number, are upgraded automatically and keep all assignments. If you downgrade after a future build has saved a newer schema, this build still uses the settings it understands but does not save over them; **Help** shows a notice, and changes made in the older build are not kept.
+The settings entry carries a schema number (currently 2). Settings from earlier builds are upgraded automatically and keep all assignments; the held-button repeat preference from builds before 0.5.0 is dropped. If you downgrade after a future build has saved a newer schema, this build still uses the settings it understands but does not save over them; **Help** shows a notice, and changes made in the older build are not kept.
 
 If only Micro was enabled, Micro is selected. Otherwise Zero 2 is selected, including when both old profiles were enabled. Mapping stays disabled if all installed legacy profiles were disabled. New installations default to enabled with Zero 2 selected.
 
@@ -77,7 +77,7 @@ Selecting an action in this picker replaces that button's native key assignment.
 Action availability follows your KOReader version, device capabilities, enabled plugins, and current document or file-browser context. A button supplies no touch position or swipe distance, so touch-location actions cannot reproduce a tap at a particular screen coordinate. Use explicit numeric amounts for incremental actions. Gesture-specific controls such as “Always active” govern touch recognition and do not apply to remote buttons.
 
 
-Repeat uses KOReader's normal key-repeat pipeline when enabled, including custom actions. Assignments and preferences are saved automatically with KOReader's global settings.
+Holding a button does not repeat it: each press acts once, including custom actions. Assignments and preferences are saved automatically with KOReader's global settings.
 
 ## Requirements and troubleshooting
 
@@ -85,7 +85,7 @@ Your operating system and KOReader's input integration must already deliver the 
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.4.0**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.5.0**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 
@@ -98,7 +98,7 @@ luajit tests/run.lua
 luajit tests/run.lua micro
 ```
 
-Tests stub KOReader services and exercise mappings, press/release/repeat, menus, settings persistence, profile switching, migration, event-map replacement, reader/file-manager lifecycle, the full tap-corner action picker, multiple action selections, custom action routing, numeric arguments, QuickMenus, action sequences, and reset. Actual Bluetooth delivery and reader/menu behavior still require hardware testing.
+Tests stub KOReader services and exercise mappings, press/release, repeat suppression, menus, settings persistence, profile switching, migration, event-map replacement, reader/file-manager lifecycle, the full tap-corner action picker, multiple action selections, custom action routing, numeric arguments, QuickMenus, action sequences, and reset. Actual Bluetooth delivery and reader/menu behavior still require hardware testing.
 
 Build the standalone installation archive:
 

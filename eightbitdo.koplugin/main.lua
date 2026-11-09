@@ -10,7 +10,7 @@ local directory = debug.getinfo(1, "S").source:match("^@(.*/)")
 local Config = dofile(directory .. "config.lua")
 local SETTING = "eightbitdo_remotes"
 local EV_KEY = 1
-local VERSION = "0.4.0"
+local VERSION = "0.5.0"
 local state = { capabilities = {} }
 local by_code = {}
 for profile_index, profile in ipairs(Config.order) do
@@ -50,7 +50,9 @@ local function adjustEvent(input, ev)
     local settings = state.settings.profiles[profile]
     local key = settings.mappings[mapping.button.id]
     if settings.actions[mapping.button.id] ~= nil then key = mapping.key end
-    if key == "none" or (ev.value == 2 and not settings.repeat_keys) then
+    -- Held buttons never repeat: drop autorepeat events along with ignored
+    -- buttons. Press and release still pass through.
+    if key == "none" or ev.value == 2 then
         key = nil
     end
     -- External Keyboard may replace event_map, so refresh each private entry
@@ -281,15 +283,6 @@ function Remotes:addToMainMenu(menu_items)
                 sub_item_table_func = function() return self:getRemoteMenu() end,
             },
             {
-                text = _("Allow held-button repeat"),
-                checked_func = function() return state.settings.profiles[state.settings.remote].repeat_keys end,
-                callback = function()
-                    local settings = state.settings.profiles[state.settings.remote]
-                    settings.repeat_keys = not settings.repeat_keys
-                    self:save()
-                end,
-            },
-            {
                 text = _("Button assignments"),
                 sub_item_table_func = function() return self:getAssignmentsMenu() end,
             },
@@ -299,7 +292,7 @@ function Remotes:addToMainMenu(menu_items)
                     UIManager:show(InfoMessage:new{
                         text = "8BitDo remotes v" .. VERSION .. "\n\n"
                             .. (state.read_only and _("Settings were saved by a newer version of this plugin. Changes made with this version are not saved.") .. "\n\n" or "")
-                            .. _("Select Zero 2 or Micro under Remote. Button assignments and repeat preferences are saved separately for each remote. Switching applies immediately. Open a button to see the Gesture Manager action categories directly: General, Device, Screen and lights, File browser, Reader, and document-specific actions. Native navigation keys are in their own submenu. Multiple actions and QuickMenus are supported.\n\nConnect the remote in HID keyboard mode (K on Micro) using your device's Bluetooth tools. This plugin maps input already delivered to KOReader; it does not pair or open Bluetooth devices.\n\nDisable or remove the old standalone Zero 2 and Micro plugins, then restart KOReader. Their saved assignments are imported on first use.\n\nMappings also affect physical keyboards sending the same codes. Disable remote mappings when typing. Micro Star emits no key; Capture is configurable."),
+                            .. _("Select Zero 2 or Micro under Remote. Button assignments are saved separately for each remote. Switching applies immediately. Open a button to see the Gesture Manager action categories directly: General, Device, Screen and lights, File browser, Reader, and document-specific actions. Native navigation keys are in their own submenu. Multiple actions and QuickMenus are supported.\n\nConnect the remote in HID keyboard mode (K on Micro) using your device's Bluetooth tools. This plugin maps input already delivered to KOReader; it does not pair or open Bluetooth devices.\n\nDisable or remove the old standalone Zero 2 and Micro plugins, then restart KOReader. Their saved assignments are imported on first use.\n\nMappings also affect physical keyboards sending the same codes. Disable remote mappings when typing. Micro Star emits no key; Capture is configurable."),
                     })
                 end,
             },

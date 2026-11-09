@@ -42,7 +42,8 @@ limitations honestly instead of inventing gesture coordinates.
 
 - Keep both remotes in the combined plugin. Their overlapping key codes require
   manual profile selection; do not infer a controller from the key code alone.
-- Preserve per-profile mappings, gesture actions, and held-button repeat settings.
+- Preserve per-profile mappings and gesture actions. Held-button repeat was
+  removed in 0.5.0 by request; do not reintroduce it without a task reason.
   Reset only the profile whose assignment menu was opened. Menu callbacks must
   keep targeting that profile even if the active remote subsequently changes.
 - Keep settings under `eightbitdo_remotes`. Preserve migration from
@@ -60,9 +61,10 @@ limitations honestly instead of inventing gesture coordinates.
 - Route custom actions through KOReader's normal key handling and Dispatcher.
   Never execute actions directly in the raw event-adjust hook: that would bypass
   normal input inhibition and UI dispatch.
-- Preserve press/release handling and optional repeat suppression. Keep one
-  shared input hook across reader and file-manager instances, and tolerate
-  External Keyboard replacing its event map or device capability functions.
+- Preserve press/release handling and always drop autorepeat (`value == 2`)
+  events for translated buttons. Keep one shared input hook across reader and
+  file-manager instances, and tolerate External Keyboard replacing its event map
+  or device capability functions.
 - Broadcast `PhysicalKeyboardConnected` only when the plugin actually changes
   the effective `Device:hasKeys()` or `Device:hasDPad()` result. In 2026.07.1,
   FileManager answers that event with a full `reinit` (settings flush and file

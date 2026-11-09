@@ -113,7 +113,7 @@ for code, key in pairs(expected) do
         equal(ev.value, value, "Preserve press/release")
     end
     local _, actual = event(code, 2)
-    equal(actual, nil, "Repeat disabled by default")
+    equal(actual, nil, "Held buttons never repeat")
 end
 equal(Device.input.event_map[up_code], original_letter, "Original keyboard mapping intact")
 equal(event(116).code, 116, "Power key untouched")
@@ -123,12 +123,14 @@ equal(event(999).code, 999, "Unknown keys untouched")
 local menu = {}
 plugin:addToMainMenu(menu)
 local items = menu.eightbitdo.sub_item_table
-items[5].callback()
-assert(UIManager.last_widget.text:find("v0.4.0", 1, true), "Help identifies installed build")
-local assignments = items[4].sub_item_table_func()
-items[3].callback() -- Enable repeat.
-local _, repeat_key = event(37, 2)
-equal(repeat_key, "LPgBack")
+equal(#items, 4, "Menu: enable, remote, assignments, help")
+for _, item in ipairs(items) do
+    assert(not (item.text or ""):find("repeat", 1, true), "No repeat setting in the menu")
+end
+items[4].callback()
+assert(UIManager.last_widget.text:find("v0.5.0", 1, true), "Help identifies installed build")
+assert(not UIManager.last_widget.text:find("repeat", 1, true), "Help does not mention repeat")
+local assignments = items[3].sub_item_table_func()
 local actions = assignments[1].sub_item_table_func()[1].sub_item_table_func() -- Native D-pad up choices.
 actions[1].callback() -- Reassign to next page.
 equal(select(2, event(up_code)), "LPgFwd")
@@ -195,7 +197,7 @@ if profile == "micro" then
     equal(key, nil, "Capture ignored by default")
     local micro_menu = {}
     plugin:addToMainMenu(micro_menu)
-    local capture = micro_menu.eightbitdo.sub_item_table[4].sub_item_table_func()[15].sub_item_table_func()[1].sub_item_table_func()
+    local capture = micro_menu.eightbitdo.sub_item_table[3].sub_item_table_func()[15].sub_item_table_func()[1].sub_item_table_func()
     capture[1].callback()
     equal(select(2, event(31)), "LPgFwd", "Capture can be assigned")
     equal(event(0).code, 0, "Star Null is not mapped to KEY_RESERVED")
@@ -213,11 +215,8 @@ equal(event(38).code == 38, other ~= "micro", "Micro-only keys pass through on Z
 local other_menu = plugin:getAssignmentsMenu()
 other_menu[1].sub_item_table_func()[1].sub_item_table_func()[1].callback()
 equal(select(2, event(other == "micro" and 46 or 32)), "LPgFwd")
-local other_repeat = saved[setting].profiles[other].repeat_keys
 plugin:selectRemote(profile)
 equal(saved[setting].profiles[profile].mappings.b, before)
-equal(saved[setting].profiles[profile].repeat_keys, true)
-equal(saved[setting].profiles[other].repeat_keys, other_repeat)
 -- A menu opened for the other profile continues to edit that profile.
 other_menu[#other_menu].callback()
 equal(saved[setting].profiles[profile].mappings.b, before)
@@ -239,7 +238,7 @@ local migrated = Config.load(nil, legacy_zero, legacy_micro)
 equal(migrated.remote, "micro")
 equal(migrated.enabled, true)
 equal(migrated.profiles.zero2.mappings.up, "Menu")
-equal(migrated.profiles.zero2.repeat_keys, true)
+equal(migrated.profiles.zero2.repeat_keys, nil, "Legacy repeat preference dropped")
 equal(migrated.profiles.micro.mappings.b, "Press")
 migrated.profiles.zero2.mappings.up = "Back"
 equal(legacy_zero.mappings.up, "Menu", "Migration does not alias legacy tables")
@@ -257,7 +256,7 @@ for _, malformed in ipairs({ false, "bad", 42, { profiles = "bad", remote = "unk
     equal(normalized.remote, "zero2")
     equal(normalized.profiles.micro.mappings.up, "Up")
 end
-print(profile .. " PASS: mapping, menus, persistence, repeat, switching, lifecycle, migration")
+print(profile .. " PASS: mapping, menus, persistence, no repeat, switching, lifecycle, migration")
 
 -- Gesture actions travel as private keys through KOReader's normal input
 -- pipeline, so the raw hook cannot run actions during suspend/input inhibition.
@@ -291,11 +290,8 @@ equal(not button_menu[1].checked_func(), true)
 local count = #executions
 event(up_code, 0)
 equal(#executions, count, "Release never executes an action")
-local repeat_menu = {}; plugin:addToMainMenu(repeat_menu)
-if saved[setting].profiles[profile].repeat_keys then repeat_menu.eightbitdo.sub_item_table[3].callback() end
-equal(select(2, event(up_code, 2)), nil, "Custom action repeat suppressed")
-repeat_menu.eightbitdo.sub_item_table[3].callback()
-equal(select(2, event(up_code, 2)), key, "Custom action repeat allowed")
+equal(select(2, event(up_code, 2)), nil, "Custom action never repeats")
+equal(#executions, count, "Held custom button runs its action once")
 plugin:setEnabled(false)
 plugin:onEightBitDoAction(binding.args)
 equal(#executions, count, "Disabled plugin refuses stale event")
@@ -386,7 +382,7 @@ equal(Config.normalizeProfile({ actions = { up = "bad" } }, profile).actions.up,
 print(profile .. " PASS: full tap-corner picker, multiple actions, numeric args, private keys, sequences, reset")
 
 -- Settings schema: the stored shape is locked to Config.SCHEMA.
-equal(Config.SCHEMA, 1)
+equal(Config.SCHEMA, 2)
 equal(saved[setting].schema, Config.SCHEMA, "Saved settings carry the schema")
 local function keys_of(value)
     local list = {}
@@ -398,7 +394,7 @@ local locked = Config.normalize(nil)
 equal(keys_of(locked), "enabled,profiles,remote,schema", "Top-level shape locked")
 equal(keys_of(locked.profiles), "micro,zero2", "Profile set locked")
 for _, id in ipairs(Config.order) do
-    equal(keys_of(locked.profiles[id]), "actions,mappings,repeat_keys", "Profile shape locked")
+    equal(keys_of(locked.profiles[id]), "actions,mappings", "Profile shape locked")
 end
 equal(keys_of(Config.normalize({ surprise = true })), "enabled,profiles,remote,schema", "Unknown fields dropped")
 equal(#Config.migrations, Config.SCHEMA, "Every schema number has a migration")
@@ -406,13 +402,25 @@ equal(#Config.migrations, Config.SCHEMA, "Every schema number has a migration")
 local pre_schema = { enabled = false, remote = "micro",
     profiles = { micro = { repeat_keys = true, mappings = { b = "Press" }, actions = { a = { night_mode = true } } } } }
 local upgraded = Config.load(pre_schema)
-equal(upgraded.schema, 1)
+equal(upgraded.schema, 2)
 equal(upgraded.enabled, false)
 equal(upgraded.remote, "micro")
 equal(upgraded.profiles.micro.mappings.b, "Press")
-equal(upgraded.profiles.micro.repeat_keys, true)
+equal(upgraded.profiles.micro.repeat_keys, nil, "Repeat preference dropped")
 equal(upgraded.profiles.micro.actions.a.night_mode, true)
 equal(pre_schema.schema, nil, "Migration does not modify the stored table")
+equal(pre_schema.profiles.micro.repeat_keys, true, "Migration leaves the stored repeat flag alone")
+-- Schema 1 (0.4.0) settings drop repeat_keys and keep everything else.
+local schema1 = { schema = 1, enabled = true, remote = "zero2", profiles = {
+    zero2 = { repeat_keys = true, mappings = { up = "Menu" }, actions = { b = { night_mode = true } } },
+    micro = "bad" } }
+local from1 = Config.load(schema1)
+equal(from1.schema, 2)
+equal(from1.profiles.zero2.repeat_keys, nil)
+equal(from1.profiles.zero2.mappings.up, "Menu")
+equal(from1.profiles.zero2.actions.b.night_mode, true)
+equal(from1.profiles.micro.mappings.up, "Up", "Malformed profile falls back to defaults")
+equal(schema1.profiles.zero2.repeat_keys, true, "Stored schema 1 table not modified")
 upgraded.profiles.micro.actions.a.night_mode = false
 equal(pre_schema.profiles.micro.actions.a.night_mode, true, "Migration copies actions")
 for _, malformed in ipairs({ "1", -1, 0.5, true }) do
@@ -437,7 +445,7 @@ plugin:selectRemote(other)
 plugin:onFlushSettings()
 local newer_menu = {}
 plugin:addToMainMenu(newer_menu)
-newer_menu.eightbitdo.sub_item_table[5].callback()
+newer_menu.eightbitdo.sub_item_table[4].callback()
 assert(UIManager.last_widget.text:find("newer version", 1, true), "Help explains read-only settings")
 equal(saves, save_total, "Newer settings never saved over")
 equal(saved[setting], newer)

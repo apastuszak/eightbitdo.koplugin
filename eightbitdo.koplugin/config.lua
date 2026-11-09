@@ -63,7 +63,7 @@ end
 
 function Config.normalizeProfile(saved, profile)
     saved = asTable(saved)
-    local result = { repeat_keys = saved.repeat_keys == true, mappings = {}, actions = {} }
+    local result = { mappings = {}, actions = {} }
     local valid = {}
     for _, action in ipairs(Config.actions) do valid[action.key] = true end
     local mappings = asTable(saved.mappings)
@@ -82,15 +82,22 @@ end
 --   schema   integer, Config.SCHEMA when written by this build
 --   enabled  boolean
 --   remote   "zero2" | "micro"
---   profiles.<remote>.repeat_keys  boolean
 --   profiles.<remote>.mappings.<button id>  Config.actions key
 --   profiles.<remote>.actions.<button id>   Dispatcher action table (optional)
 -- Changing this shape requires bumping Config.SCHEMA and adding a migration
 -- for the new number. Never renumber or remove existing migrations.
-Config.SCHEMA = 1
+Config.SCHEMA = 2
 Config.migrations = {
-    -- Builds before 0.4.0 stored no schema field but already used this shape.
+    -- Builds before 0.4.0 stored no schema field but already used the
+    -- schema 1 shape (this shape plus profiles.<remote>.repeat_keys).
     [1] = function(saved) return saved end,
+    -- 0.5.0 removed held-button repeat; held buttons never repeat.
+    [2] = function(saved)
+        for _, profile in pairs(asTable(saved.profiles)) do
+            if type(profile) == "table" then profile.repeat_keys = nil end
+        end
+        return saved
+    end,
 }
 
 -- Returns the stored schema number; missing or malformed values count as 0
