@@ -1,52 +1,55 @@
 -- Linux EV_KEY codes. Zero 2 codes supplied by the user; Micro letters
 -- transcribed from the supplied screenshot and translated via Linux headers.
+local _ = require("gettext")
+
 local Config = {}
 Config.order = { "zero2", "micro" }
+-- Product names are not translated.
 Config.names = { zero2 = "8BitDo Zero 2", micro = "8BitDo Micro" }
 Config.buttons = {
     zero2 = {
-    { id = "up",    label = "D-pad up",     code = 32, default = "Up" },
-    { id = "down",  label = "D-pad down",   code = 46, default = "Down" },
-    { id = "left",  label = "D-pad left",   code = 18, default = "Left" },
-    { id = "right", label = "D-pad right",  code = 33, default = "Right" },
-    { id = "l",     label = "Left bumper",  code = 37, default = "LPgBack" },
-    { id = "r",     label = "Right bumper", code = 50, default = "LPgFwd" },
-    { id = "y",     label = "Y",            code = 23, default = "LPgBack" },
-    { id = "a",     label = "A",            code = 34, default = "Press" },
-    { id = "x",     label = "X",            code = 36, default = "Menu" },
-    { id = "b",     label = "B",            code = 35, default = "Back" },
+    { id = "up",    label = _("D-pad up"),     code = 32, default = "Up" },
+    { id = "down",  label = _("D-pad down"),   code = 46, default = "Down" },
+    { id = "left",  label = _("D-pad left"),   code = 18, default = "Left" },
+    { id = "right", label = _("D-pad right"),  code = 33, default = "Right" },
+    { id = "l",     label = _("Left bumper"),  code = 37, default = "LPgBack" },
+    { id = "r",     label = _("Right bumper"), code = 50, default = "LPgFwd" },
+    { id = "y",     label = _("Y"),            code = 23, default = "LPgBack" },
+    { id = "a",     label = _("A"),            code = 34, default = "Press" },
+    { id = "x",     label = _("X"),            code = 36, default = "Menu" },
+    { id = "b",     label = _("B"),            code = 35, default = "Back" },
 },
     micro = {
-    { id = "up",      label = "D-pad up",       code = 46, default = "Up" }, -- C
-    { id = "down",    label = "D-pad down",     code = 32, default = "Down" }, -- D
-    { id = "left",    label = "D-pad left",     code = 18, default = "Left" }, -- E
-    { id = "right",   label = "D-pad right",    code = 33, default = "Right" }, -- F
-    { id = "l",       label = "Left bumper (L)", code = 37, default = "LPgBack" }, -- K
-    { id = "r",       label = "Right bumper (R)",code = 50, default = "LPgFwd" }, -- M
-    { id = "y",       label = "Y",              code = 23, default = "LPgBack" }, -- I
-    { id = "a",       label = "A",              code = 34, default = "Press" }, -- G
-    { id = "x",       label = "X",              code = 35, default = "Menu" }, -- H
-    { id = "b",       label = "B",              code = 36, default = "Back" }, -- J
-    { id = "l2",      label = "L2",             code = 38, default = "LPgBack" }, -- L
-    { id = "r2",      label = "R2",             code = 19, default = "LPgFwd" }, -- R
-    { id = "minus",   label = "Minus (-)",      code = 49, default = "Back" }, -- N
-    { id = "plus",    label = "Plus (+)",       code = 24, default = "Menu" }, -- O
-    { id = "capture", label = "Capture",        code = 31, default = "none" }, -- S
+    { id = "up",      label = _("D-pad up"),       code = 46, default = "Up" }, -- C
+    { id = "down",    label = _("D-pad down"),     code = 32, default = "Down" }, -- D
+    { id = "left",    label = _("D-pad left"),     code = 18, default = "Left" }, -- E
+    { id = "right",   label = _("D-pad right"),    code = 33, default = "Right" }, -- F
+    { id = "l",       label = _("Left bumper (L)"), code = 37, default = "LPgBack" }, -- K
+    { id = "r",       label = _("Right bumper (R)"),code = 50, default = "LPgFwd" }, -- M
+    { id = "y",       label = _("Y"),              code = 23, default = "LPgBack" }, -- I
+    { id = "a",       label = _("A"),              code = 34, default = "Press" }, -- G
+    { id = "x",       label = _("X"),              code = 35, default = "Menu" }, -- H
+    { id = "b",       label = _("B"),              code = 36, default = "Back" }, -- J
+    { id = "l2",      label = _("L2"),             code = 38, default = "LPgBack" }, -- L
+    { id = "r2",      label = _("R2"),             code = 19, default = "LPgFwd" }, -- R
+    { id = "minus",   label = _("Minus (-)"),      code = 49, default = "Back" }, -- N
+    { id = "plus",    label = _("Plus (+)"),       code = 24, default = "Menu" }, -- O
+    { id = "capture", label = _("Capture"),        code = 31, default = "none" }, -- S
     -- Star is Null in the supplied screenshot: no keyboard event to map.
 },
 }
 
 Config.actions = {
-    { key = "LPgFwd",  label = "Next page" },
-    { key = "LPgBack", label = "Previous page" },
-    { key = "Up",      label = "Up" },
-    { key = "Down",    label = "Down" },
-    { key = "Left",    label = "Left" },
-    { key = "Right",   label = "Right" },
-    { key = "Press",   label = "Select" },
-    { key = "Back",    label = "Back" },
-    { key = "Menu",    label = "Menu" },
-    { key = "none",    label = "Ignore button" },
+    { key = "LPgFwd",  label = _("Next page") },
+    { key = "LPgBack", label = _("Previous page") },
+    { key = "Up",      label = _("Up") },
+    { key = "Down",    label = _("Down") },
+    { key = "Left",    label = _("Left") },
+    { key = "Right",   label = _("Right") },
+    { key = "Press",   label = _("Select") },
+    { key = "Back",    label = _("Back") },
+    { key = "Menu",    label = _("Menu") },
+    { key = "none",    label = _("Ignore button") },
 }
 
 

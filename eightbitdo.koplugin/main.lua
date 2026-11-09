@@ -10,7 +10,7 @@ local directory = debug.getinfo(1, "S").source:match("^@(.*/)")
 local Config = dofile(directory .. "config.lua")
 local SETTING = "eightbitdo_remotes"
 local EV_KEY = 1
-local VERSION = "0.5.0"
+local VERSION = "0.6.0"
 local state = { capabilities = {} }
 local by_code = {}
 for profile_index, profile in ipairs(Config.order) do
@@ -61,6 +61,18 @@ local function adjustEvent(input, ev)
     ev.code = mapping.virtual_code
 end
 
+-- Number of Dispatcher actions in an assignment (its "settings" entry holds
+-- options, not an action). Returns 0 for no assignment.
+local function countActions(actions)
+    local count = 0
+    if type(actions) == "table" then
+        for name in pairs(actions) do
+            if name ~= "settings" then count = count + 1 end
+        end
+    end
+    return count
+end
+
 local function capabilities()
     return Device:hasKeys() and true or false, Device:hasDPad() and true or false
 end
@@ -73,8 +85,14 @@ local function updateCapabilities(keys, dpad)
     enableCapabilities()
     local new_keys, new_dpad = capabilities()
     if new_keys ~= keys or new_dpad ~= dpad then
+        -- Gaining keys asks widgets to register bindings; losing them lets
+        -- widgets drop bindings the device can no longer reach. In 2026.07.1
+        -- every reader and file-manager module that binds keys re-registers
+        -- them on Connected, so a later re-enable restores them.
+        local gained = (new_keys and not keys) or (new_dpad and not dpad)
+        local name = gained and "PhysicalKeyboardConnected" or "PhysicalKeyboardDisconnected"
         UIManager:nextTick(function()
-            UIManager:broadcastEvent(Event:new("PhysicalKeyboardConnected"))
+            UIManager:broadcastEvent(Event:new(name))
         end)
     end
 end
@@ -172,6 +190,8 @@ end
 function Remotes:onPhysicalKeyboardConnected()
     enableCapabilities()
 end
+-- Also overrides InputContainer's handler, which would clear this plugin's
+-- private key bindings when the device reports no keys.
 Remotes.onPhysicalKeyboardDisconnected = Remotes.onPhysicalKeyboardConnected
 
 function Remotes:getRemoteMenu()
@@ -179,7 +199,7 @@ function Remotes:getRemoteMenu()
     for dummy, id in ipairs(Config.order) do
         local profile = id
         items[#items + 1] = {
-            text = _(Config.names[profile]),
+            text = Config.names[profile],
             checked_func = function() return state.settings.remote == profile end,
             callback = function() self:selectRemote(profile) end,
         }
@@ -189,7 +209,7 @@ end
 
 function Remotes:getActionLabel(key)
     for dummy, action in ipairs(Config.actions) do
-        if action.key == key then return _(action.label) end
+        if action.key == key then return action.label end
     end
 end
 
@@ -198,7 +218,7 @@ function Remotes:getNativeKeyMenu(profile, button)
     for dummy, action in ipairs(Config.actions) do
         local key = action.key
         items[#items + 1] = {
-            text = _(action.label),
+            text = action.label,
             checked_func = function()
                 local settings = state.settings.profiles[profile]
                 return settings.actions[button.id] == nil and settings.mappings[button.id] == key
@@ -226,12 +246,36 @@ function Remotes:getButtonMenu(profile, button)
     }
     -- Put the same categories used by Tap corner directly in the assignment
     -- menu, instead of hiding them after a page of navigation key choices.
+    local location = state.settings.profiles[profile].actions
+    local last_count = countActions(location[button.id])
+    local chose_nothing = false
     local caller = setmetatable({ profiles = {} }, {
         __newindex = function(_, key, value)
-            if key == "updated" and value then self:save() end
+            if key ~= "updated" or not value then return end
+            -- Dispatcher leaves an empty assignment when the last action is
+            -- unchecked. Treat that as returning to the native key; only an
+            -- explicit "Nothing" keeps a button that does nothing.
+            local count = countActions(location[button.id])
+            if count == 0 and last_count > 0 and not chose_nothing then
+                location[button.id] = nil
+            end
+            last_count, chose_nothing = count, false
+            self:save()
         end,
     })
-    Dispatcher:addSubMenu(caller, menu, state.settings.profiles[profile].actions, button.id)
+    local start = #menu
+    Dispatcher:addSubMenu(caller, menu, location, button.id)
+    for index = start + 1, #menu do
+        local item = menu[index]
+        if item.text == _("Nothing") and type(item.callback) == "function" then
+            local callback = item.callback
+            item.callback = function(...)
+                chose_nothing = true
+                return callback(...)
+            end
+            break
+        end
+    end
     return menu
 end
 
@@ -244,7 +288,7 @@ function Remotes:getAssignmentsMenu()
         local button = definition
         items[#items + 1] = {
             text_func = function()
-                return string.format("%s (%d): %s", _(button.label), button.code,
+                return string.format("%s (%d): %s", button.label, button.code,
                     self:getButtonLabel(profile, button.id))
             end,
             sub_item_table_func = function() return self:getButtonMenu(profile, button) end,
@@ -279,7 +323,7 @@ function Remotes:addToMainMenu(menu_items)
                 callback = function() self:setEnabled(not state.settings.enabled) end,
             },
             {
-                text_func = function() return _("Remote") .. ": " .. _(Config.names[state.settings.remote]) end,
+                text_func = function() return _("Remote") .. ": " .. Config.names[state.settings.remote] end,
                 sub_item_table_func = function() return self:getRemoteMenu() end,
             },
             {

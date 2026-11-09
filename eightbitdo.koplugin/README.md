@@ -4,7 +4,7 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 ## Install or upgrade
 
-Current plugin build: **0.5.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.5.0.koplugin.zip`.
+Current plugin build: **0.6.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.6.0.koplugin.zip`.
 
 1. Exit KOReader. If you installed either standalone plugin, remove `koreader/plugins/zero2.koplugin` and `koreader/plugins/micro.koplugin` from the device. Keep your KOReader settings so their assignments can be imported.
 2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
@@ -72,7 +72,7 @@ Every emitting button can be assigned **Next page**, **Previous page**, **Up**, 
 
 For the full action list offered under **Gesture Manager → Tap corner**, open **8BitDo remotes → Button assignments → [button]**. The action categories appear directly in the button menu: **General**, **Device**, **Screen and lights**, **File browser**, **Reader**, and document-specific categories. Basic keys are grouped under **Native navigation keys**. This uses KOReader's own Dispatcher picker, including actions registered by other enabled plugins. The complete action picker is available, including multiple actions, numeric parameters, action sequences and QuickMenus. There is no one-action restriction. Numeric settings such as brightness and font-size changes use the same parameter controls as gestures.
 
-Selecting an action in this picker replaces that button's native key assignment. Merely opening the picker changes nothing. Choose **Nothing** inside the picker to consume the button without an action. Selecting any native assignment again clears the gesture actions. Existing assignments, including sequences and QuickMenus, survive upgrades and edits. Resetting a remote clears its gesture actions as well as resetting its native assignments.
+Selecting an action in this picker replaces that button's native key assignment. Merely opening the picker changes nothing. Choose **Nothing** inside the picker to consume the button without an action. Unchecking the last selected action instead returns the button to its native key assignment. Selecting any native assignment again clears the gesture actions. Existing assignments, including sequences and QuickMenus, survive upgrades and edits. Resetting a remote clears its gesture actions as well as resetting its native assignments.
 
 Action availability follows your KOReader version, device capabilities, enabled plugins, and current document or file-browser context. A button supplies no touch position or swipe distance, so touch-location actions cannot reproduce a tap at a particular screen coordinate. Use explicit numeric amounts for incremental actions. Gesture-specific controls such as “Always active” govern touch recognition and do not apply to remote buttons.
 
@@ -85,7 +85,7 @@ Your operating system and KOReader's input integration must already deliver the 
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.5.0**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.6.0**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 
@@ -98,7 +98,7 @@ luajit tests/run.lua
 luajit tests/run.lua micro
 ```
 
-Tests stub KOReader services and exercise mappings, press/release, repeat suppression, menus, settings persistence, profile switching, migration, event-map replacement, reader/file-manager lifecycle, the full tap-corner action picker, multiple action selections, custom action routing, numeric arguments, QuickMenus, action sequences, and reset. Actual Bluetooth delivery and reader/menu behavior still require hardware testing.
+Tests stub KOReader services and exercise mappings, press/release, repeat suppression, menus, settings persistence, profile switching, migration, event-map replacement, reader/file-manager lifecycle, the full tap-corner action picker, multiple action selections, custom action routing, returning to the native key when the last action is unchecked, keyboard connect/disconnect signals, translatable labels, numeric arguments, QuickMenus, action sequences, and reset. Actual Bluetooth delivery and reader/menu behavior still require hardware testing.
 
 Build the standalone installation archive:
 

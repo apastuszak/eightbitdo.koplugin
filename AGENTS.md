@@ -70,6 +70,13 @@ limitations honestly instead of inventing gesture coordinates.
   FileManager answers that event with a full `reinit` (settings flush and file
   list rebuild), so an unconditional broadcast redraws it on every opening. The
   test stubs cannot show that side effect; the suite counts broadcasts instead.
+  Send `PhysicalKeyboardDisconnected` when the plugin removes keys (mappings
+  turned off on a touch-only device) and keep overriding InputContainer's
+  disconnect handler so the plugin's private bindings are not cleared.
+- In the button picker, unchecking the last action returns the button to its
+  native key; only Dispatcher's explicit **Nothing** keeps an empty assignment.
+- Mark user-facing labels in `config.lua` with `_()` where they are defined;
+  do not translate product names or wrap those labels again in `main.lua`.
 - Bluetooth pairing and operating-system input delivery are outside the plugin.
 - Use LuaJIT-compatible Lua, four-space indentation, and the existing gettext
   pattern for user-facing strings. Avoid adding dependencies for routine changes.

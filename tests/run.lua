@@ -6,6 +6,8 @@ local setting = "eightbitdo_remotes"
 local up_code = profile == "micro" and 46 or 32
 local back_code = profile == "micro" and 36 or 35
 local original_letter = profile == "micro" and "C" or "D"
+local translated = {}
+package.loaded.gettext = function(text) translated[text] = true; return text end
 local Config = dofile(directory .. "config.lua")
 local broadcasts, hooks, queue, saved, executions = {}, {}, {}, {}, {}
 local saves = 0
@@ -41,7 +43,7 @@ function Dispatcher:addSubMenu(caller, menu, location, button)
         location[button].night_mode = true
         caller.updated = true
     end }
-    menu[start + 2] = { callback = function()
+    menu[start + 2] = { text = "Nothing", callback = function()
         location[button] = {}
         caller.updated = true
     end }
@@ -53,6 +55,15 @@ function Dispatcher:addSubMenu(caller, menu, location, button)
     menu.max_per_page = start + 3
     menu[start + 4] = { text = "Show as QuickMenu" }
     menu[start + 5] = { text = "Execute one by one" }
+    menu[start + 6] = { text = "Toggle night mode", callback = function()
+        if location[button] and location[button].night_mode then
+            location[button].night_mode = nil
+        else
+            location[button] = location[button] or {}
+            location[button].night_mode = true
+        end
+        caller.updated = true
+    end }
 end
 function Dispatcher:execute(actions, properties)
     executions[#executions + 1] = { actions = actions, properties = properties }
@@ -61,7 +72,6 @@ function Dispatcher.getActionArgs() return { 10, 20 }, "set_font" end
 package.loaded.dispatcher = Dispatcher
 package.loaded["ui/event"] = { new = function(_, name) return { name = name } end }
 package.loaded["ui/widget/infomessage"] = { new = function(_, values) return values end }
-package.loaded.gettext = function(text) return text end
 G_reader_settings = {
     readSetting = function(_, key) return saved[key] end,
     saveSetting = function(_, key, value) saved[key] = value; saves = saves + 1 end,
@@ -128,7 +138,7 @@ for _, item in ipairs(items) do
     assert(not (item.text or ""):find("repeat", 1, true), "No repeat setting in the menu")
 end
 items[4].callback()
-assert(UIManager.last_widget.text:find("v0.5.0", 1, true), "Help identifies installed build")
+assert(UIManager.last_widget.text:find("v0.6.0", 1, true), "Help identifies installed build")
 assert(not UIManager.last_widget.text:find("repeat", 1, true), "Help does not mention repeat")
 local assignments = items[3].sub_item_table_func()
 local actions = assignments[1].sub_item_table_func()[1].sub_item_table_func() -- Native D-pad up choices.
@@ -158,6 +168,13 @@ equal(select(2, event(up_code)), "Up")
 local refreshes = #broadcasts
 drain()
 equal(#broadcasts, refreshes + 2, "Enabling and disabling refresh changed capabilities")
+equal(broadcasts[refreshes + 1].name, "PhysicalKeyboardDisconnected", "Disabling withdraws the keys")
+equal(broadcasts[refreshes + 2].name, "PhysicalKeyboardConnected", "Enabling announces the keys")
+items[1].callback() -- Disable again to check the plugin's own bindings survive.
+plugin:onPhysicalKeyboardDisconnected()
+assert(next(plugin.key_events), "Private bindings survive a disconnect while disabled")
+items[1].callback()
+drain()
 
 -- Saved preferences survive a fresh plugin module load (process restart).
 saved[setting].profiles[profile].mappings.b = "LPgFwd"
@@ -267,7 +284,7 @@ local gesture_menu = button_menu
 local native_menu = button_menu[1].sub_item_table_func()
 equal(button_menu[1].text, "Native navigation keys")
 equal(button_menu[2].text, "General", "Gesture categories visible directly under button")
-equal(#gesture_menu, 6, "Full tap-corner picker retained, including execution and QuickMenu controls")
+equal(#gesture_menu, 7, "Full tap-corner picker retained, including execution and QuickMenu controls")
 equal(gesture_menu.max_per_page, 4, "Dispatcher pagination retained")
 equal(saved[setting].profiles[profile].actions.up, nil, "Opening picker keeps native assignment")
 local save_count = saves
@@ -380,6 +397,45 @@ equal(saved[setting].profiles[profile].actions.up, nil, "Reset clears custom act
 equal(select(2, event(up_code)), "Up")
 equal(Config.normalizeProfile({ actions = { up = "bad" } }, profile).actions.up, nil)
 print(profile .. " PASS: full tap-corner picker, multiple actions, numeric args, private keys, sequences, reset")
+
+-- Unchecking the last action returns the button to its native key; only an
+-- explicit "Nothing" keeps a button that does nothing.
+local unchecked_menu = plugin:getButtonMenu(profile, Config.buttons[profile][1])
+local toggle, nothing = unchecked_menu[7], unchecked_menu[3]
+equal(nothing.text, "Nothing")
+toggle.callback()
+equal(select(2, event(up_code)), "EightBitDo_" .. profile .. "_up")
+toggle.callback()
+equal(saved[setting].profiles[profile].actions.up, nil, "Unchecking the last action clears the assignment")
+equal(select(2, event(up_code)), "Up", "Native key restored")
+equal(unchecked_menu[1].checked_func(), true, "Native navigation keys checked again")
+toggle.callback()
+nothing.callback()
+assert(saved[setting].profiles[profile].actions.up, "Explicit Nothing replacing actions is kept")
+equal(next(saved[setting].profiles[profile].actions.up), nil)
+equal(select(2, event(up_code)), "EightBitDo_" .. profile .. "_up", "Nothing consumes the button")
+unchecked_menu[1].sub_item_table_func()[2].callback() -- Native "Previous page".
+nothing.callback()
+assert(saved[setting].profiles[profile].actions.up, "Explicit Nothing from a native key is kept")
+toggle.callback()
+toggle.callback()
+equal(saved[setting].profiles[profile].actions.up, nil, "Leaving Nothing then unchecking returns to native")
+equal(select(2, event(up_code)), "LPgBack")
+local reopened = plugin:getButtonMenu(profile, Config.buttons[profile][1])
+reopened[3].callback()
+reopened = plugin:getButtonMenu(profile, Config.buttons[profile][1])
+reopened[7].callback()
+reopened[7].callback()
+equal(saved[setting].profiles[profile].actions.up, nil, "Reopened menu tracks the last action too")
+local cleanup = plugin:getAssignmentsMenu()
+cleanup[#cleanup].callback()
+
+-- Labels are marked for translation; product names are not.
+for _, text in ipairs({ "D-pad up", "Left bumper", "Capture", "Minus (-)", "Next page", "Ignore button" }) do
+    assert(translated[text], "Translatable label: " .. text)
+end
+equal(translated["8BitDo Zero 2"], nil, "Product names are not translated")
+equal(translated["8BitDo Micro"], nil)
 
 -- Settings schema: the stored shape is locked to Config.SCHEMA.
 equal(Config.SCHEMA, 2)
