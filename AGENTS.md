@@ -35,6 +35,10 @@ limitations honestly instead of inventing gesture coordinates.
 - `dist/`: installable archives containing a single `eightbitdo.koplugin/` folder.
 - `LICENSE`: GNU AGPL-3.0, matching KOReader. Keep the text verbatim.
 - `CHANGELOG.md`: user-facing release notes in Keep a Changelog format.
+- `scripts/build.sh`: runs every check and builds `dist/` archives; with
+  `--check` it only verifies (used by CI).
+- `.github/workflows/test.yml`: GitHub Actions running `scripts/build.sh --check`
+  on every push and pull request.
 - `AGENTS.md`: these repository instructions. `CLAUDE.md` only points here;
   edit this file rather than duplicating guidance there.
 - `2-pocketbook-bt-keys.lua`: separate PocketBook key patch. It is not part of
@@ -99,6 +103,9 @@ luajit tests/run.lua
 luajit tests/run.lua micro
 ```
 
+`scripts/build.sh --check` runs these plus the syntax, version, README and
+archive checks below without writing anything; CI runs the same command.
+
 Extend the regression suite when changing input routing, migration, persistence,
 profile switching, or Dispatcher integration. The suite uses stubs: passing it
 does not prove real-device Bluetooth delivery, UI rendering, or action execution.
@@ -125,13 +132,13 @@ a new versioned archive. Record user-visible changes under **Unreleased** in
 `CHANGELOG.md` as they land, and move them under the new version and date when
 releasing.
 
-From the repository root:
-
-```sh
-rm -f dist/eightbitdo.koplugin.zip
-zip -qX -r dist/eightbitdo.koplugin.zip eightbitdo.koplugin -x '*.luac' -x '*/.*'
-cp dist/eightbitdo.koplugin.zip dist/eightbitdo-VERSION.koplugin.zip
-```
+Build with `scripts/build.sh` from the repository root. It checks that the
+version agrees across `_meta.lua`, `main.lua`, both READMEs, `tests/run.lua` and
+a `CHANGELOG.md` section, runs the syntax checks and tests, then creates
+`dist/eightbitdo-VERSION.koplugin.zip` if missing and refreshes
+`dist/eightbitdo.koplugin.zip`. It leaves matching archives untouched and refuses
+to rewrite an existing versioned archive that no longer matches the source:
+bump the version instead. Do not bypass it with manual `zip` commands.
 
 Verify archive integrity and that archived bytes match the current source.
 Exclude tests, local bytecode, reference patches, and repository instructions.
