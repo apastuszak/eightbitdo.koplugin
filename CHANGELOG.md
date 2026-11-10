@@ -13,8 +13,9 @@ First public release.
 ### Added
 
 - The plugin package includes the AGPL-3.0 license.
-- The README lists the KOReader release the plugin is built for and which
-  remotes have been tested on which readers.
+- The README lists the KOReader release the plugin is built for, and that
+  both remotes were tested on a PocketBook Era Lite (Linux) and a Nook
+  (Android).
 
 ### Changed
 

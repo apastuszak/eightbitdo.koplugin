@@ -6,8 +6,12 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 Current plugin build: **1.0.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-1.0.0.koplugin.zip`.
 
+With the [App Store plugin](https://github.com/omer-faruq/appstore.koplugin), open **Tools → App Store → Plugins**, search for **eightbitdo**, install it, restart KOReader, and continue from step 4. The App Store can also update the plugin later.
+
+To install manually:
+
 1. Exit KOReader.
-2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
+2. Download **`eightbitdo.koplugin.zip`** from the latest GitHub release (or use `dist/eightbitdo.koplugin.zip` in this repository) and extract it into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
 3. Restart KOReader. If necessary, enable **8BitDo remotes** in Plugin management and restart again.
 4. Pair your remote with your reader in HID keyboard mode, using the reader's Bluetooth settings. Both remotes must be in keyboard mode; in any other mode they send game-controller buttons that the plugin cannot use.
    - **8BitDo Micro:** set the small switch on the bottom of the remote to **K**, then turn it on.
@@ -24,12 +28,12 @@ Settings are saved under `eightbitdo_remotes` with a format version, so future r
 
 ## Platforms and key codes
 
-Built for KOReader **2026.07.1**; newer releases are expected to work but have not been tested. Tested on real hardware:
+Built for KOReader **2026.07.1**; newer releases are expected to work but have not been tested. Both remotes have been tested on real hardware:
 
 | Remote | PocketBook Era Lite (Linux) | Nook (Android) |
 | --- | --- | --- |
 | 8BitDo Zero 2 | Tested | Tested |
-| 8BitDo Micro | Not yet tested | Tested |
+| 8BitDo Micro | Tested | Tested |
 
 Other KOReader devices, including other Android readers such as Boox, should work the same way but have not been tested. On Linux-based readers (PocketBook, Kobo, Kindle and similar), KOReader receives Linux `EV_KEY` codes. On Android, including Nook readers, KOReader receives Android keycodes instead, which use different numbers for the same letters; the plugin detects Android and uses the Android column below. **Button assignments** shows the code your reader actually receives. Android sends a held button as repeated presses, and the plugin ignores those just as it ignores Linux key repeats.
 

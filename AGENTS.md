@@ -149,6 +149,23 @@ Exclude tests, local bytecode, reference patches, and repository instructions.
 The installation path must be `koreader/plugins/eightbitdo.koplugin/main.lua`,
 without an extra nested plugin folder.
 
+### KOReader App Store
+
+The [App Store plugin](https://github.com/omer-faruq/appstore.koplugin) finds
+this repository through the `koreader-plugin` GitHub topic (or a repository
+name containing `.koplugin`); the repository must be public. Keep these
+properties, which it relies on:
+
+- The plugin stays in a `*.koplugin/` folder with `_meta.lua`, so the repository
+  ZIP is detected via `*.koplugin/_meta.lua`. Only that folder is installed.
+- `_meta.lua` keeps `version = "X.Y.Z"` as a plain string literal: update checks
+  read it from the default branch with a pattern match, so push the version
+  bump before publishing the release.
+- Release tags are `vX.Y.Z`, published as non-prerelease. Tags containing
+  `pre`, `rc`, `dev`, `test`, `alpha`, `beta` or `preview` are skipped.
+- Attach `dist/eightbitdo.koplugin.zip` to each release under exactly that name:
+  the asset name `*.koplugin.zip` becomes the installed folder name.
+
 When the device still shows old menus, first check the build number under
 **8BitDo remotes → Help**, installation nesting, and whether KOReader was fully
 exited before overwriting the plugin. Do not assume the current archive is loaded.
