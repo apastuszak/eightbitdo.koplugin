@@ -6,6 +6,18 @@ and versions follow [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.7.2] - 2026-11-10
+
+### Removed
+
+- Importing button assignments from the earlier standalone Zero 2 and Micro
+  plugins, along with the upgrade instructions in the README and **Help**.
+  Those plugins were never publicly released.
+
+### Changed
+
+- The README's development section describes `scripts/build.sh`, and its
+  KOReader source links point to the 2026.07.1 release.
 ## [0.7.1] - 2026-11-10
 
 ### Changed
@@ -92,6 +104,7 @@ and versions follow [Semantic Versioning](https://semver.org/).
   their settings untouched.
 - The build number in **8BitDo remotes → Help**.
 
+[0.7.2]: dist/eightbitdo-0.7.2.koplugin.zip
 [0.7.1]: dist/eightbitdo-0.7.1.koplugin.zip
 [0.7.0]: dist/eightbitdo-0.7.0.koplugin.zip
 [0.6.0]: dist/eightbitdo-0.6.0.koplugin.zip

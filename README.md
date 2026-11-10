@@ -2,11 +2,11 @@
 
 One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. Choose the remote in the menu; its button assignments are saved separately and restored when switching back.
 
-## Install or upgrade
+## Install
 
-Current plugin build: **0.7.1**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.7.1.koplugin.zip`.
+Current plugin build: **0.7.2**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.7.2.koplugin.zip`.
 
-1. Exit KOReader. If you installed either standalone plugin, remove `koreader/plugins/zero2.koplugin` and `koreader/plugins/micro.koplugin` from the device. Keep your KOReader settings so their assignments can be imported.
+1. Exit KOReader.
 2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
 3. Restart KOReader. If necessary, enable **8BitDo remotes** in Plugin management and restart again.
 4. Pair your remote with your reader in HID keyboard mode, using the reader's Bluetooth settings. Both remotes must be in keyboard mode; in any other mode they send game-controller buttons that the plugin cannot use.
@@ -16,17 +16,11 @@ Current plugin build: **0.7.1**, shown in **8BitDo remotes → Help**. The versi
 
 Only the selected profile translates input. Switching applies immediately without restarting or erasing settings. Release held buttons before switching. Both remotes use overlapping codes, so selecting the remote is manual; the plugin cannot identify the controller from the code alone.
 
-Disable or remove the standalone plugins before using this package: their input hooks otherwise compete with the combined plugin. Disabling plugins in Plugin management requires a restart.
+## Settings
 
-## Settings and migration
+The menu provides a global **Enable remote mappings** toggle, a **Remote** selector, and per-remote button assignments. Resetting assignments resets only the profile whose assignments menu you opened, preserving the other profile. New installations start enabled with Zero 2 selected.
 
-The menu provides a global **Enable remote mappings** toggle, a **Remote** selector, and per-remote button assignments. Resetting assignments resets only the profile whose assignments menu you opened, preserving the other profile.
-
-On first use, the plugin copies assignments from `eightbitdo_zero2` and `eightbitdo_micro` into the new `eightbitdo_remotes` settings entry. Legacy settings remain untouched. Later starts use the combined settings.
-
-The settings entry carries a schema number (currently 2). Settings from earlier builds are upgraded automatically and keep all assignments; the held-button repeat preference from builds before 0.5.0 is dropped. If you downgrade after a future build has saved a newer schema, this build still uses the settings it understands but does not save over them; **Help** shows a notice, and changes made in the older build are not kept.
-
-If only Micro was enabled, Micro is selected. Otherwise Zero 2 is selected, including when both old profiles were enabled. Mapping stays disabled if all installed legacy profiles were disabled. New installations default to enabled with Zero 2 selected.
+Settings are saved under `eightbitdo_remotes` with a format version, so future releases can update them automatically. If you install an older release after a newer one has saved its settings, the older release uses what it understands but does not save over them; **Help** shows a notice, and changes made in the older release are not kept.
 
 ## Platforms and key codes
 
@@ -91,7 +85,7 @@ Your operating system and KOReader's input integration must already deliver the 
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.7.1**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v0.7.2**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 
@@ -106,12 +100,13 @@ luajit tests/run.lua micro
 
 Tests stub KOReader services and exercise mappings, press/release, repeat suppression, menus, settings persistence, profile switching, migration, event-map replacement, reader/file-manager lifecycle, the full tap-corner action picker, multiple action selections, custom action routing, returning to the native key when the last action is unchecked, keyboard connect/disconnect signals, translatable labels, numeric arguments, QuickMenus, action sequences, and reset. Actual Bluetooth delivery and reader/menu behavior still require hardware testing.
 
-Build the standalone installation archive:
+Check everything and build the installation archives in `dist/`:
 
 ```sh
-zip -r dist/eightbitdo.koplugin.zip eightbitdo.koplugin
+scripts/build.sh          # checks, then builds
+scripts/build.sh --check  # checks only; CI runs this on every push
 ```
 
-The implementation follows KOReader's [input hook and key translation API](https://github.com/koreader/koreader/blob/master/frontend/device/input.lua) and [External Keyboard connection notifications](https://github.com/koreader/koreader/blob/master/plugins/externalkeyboard.koplugin/main.lua).
+The implementation follows KOReader's [input hook and key translation API](https://github.com/koreader/koreader/blob/v2026.07.1/frontend/device/input.lua) and [External Keyboard connection notifications](https://github.com/koreader/koreader/blob/v2026.07.1/plugins/externalkeyboard.koplugin/main.lua).
 
 Gesture assignments follow KOReader's [Dispatcher action picker and execution API](https://github.com/koreader/koreader/blob/master/frontend/dispatcher.lua), with key bindings handled through [InputContainer](https://github.com/koreader/koreader/blob/master/frontend/ui/widget/container/inputcontainer.lua).

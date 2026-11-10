@@ -145,8 +145,9 @@ for _, item in ipairs(items) do
     assert(not (item.text or ""):find("repeat", 1, true), "No repeat setting in the menu")
 end
 items[4].callback()
-assert(UIManager.last_widget.text:find("v0.7.1", 1, true), "Help identifies installed build")
+assert(UIManager.last_widget.text:find("v0.7.2", 1, true), "Help identifies installed build")
 assert(not UIManager.last_widget.text:find("repeat", 1, true), "Help does not mention repeat")
+assert(not UIManager.last_widget.text:find("standalone", 1, true), "Help has no upgrade instructions")
 assert(UIManager.last_widget.text:find("switch on the bottom to K", 1, true), "Help explains Micro keyboard mode")
 assert(UIManager.last_widget.text:find("hold the right bumper (R) while turning it on", 1, true), "Help explains Zero 2 keyboard mode")
 local assignments = items[3].sub_item_table_func()
@@ -258,23 +259,12 @@ equal(event(46).code, 46)
 equal(event(38).code, 38)
 equal(Device:hasKeys(), false)
 
--- Migration is deterministic, copies both profiles, and keeps old settings intact.
-local legacy_zero = { enabled = false, repeat_keys = true, mappings = { up = "Menu" } }
-local legacy_micro = { enabled = true, mappings = { b = "Press" } }
-local migrated = Config.load(nil, legacy_zero, legacy_micro)
-equal(migrated.remote, "micro")
-equal(migrated.enabled, true)
-equal(migrated.profiles.zero2.mappings.up, "Menu")
-equal(migrated.profiles.zero2.repeat_keys, nil, "Legacy repeat preference dropped")
-equal(migrated.profiles.micro.mappings.b, "Press")
-migrated.profiles.zero2.mappings.up = "Back"
-equal(legacy_zero.mappings.up, "Menu", "Migration does not alias legacy tables")
-equal(Config.load(nil, { enabled = true }, { enabled = true }).remote, "zero2")
-equal(Config.load(nil, { enabled = false }, { enabled = false }).enabled, false)
-equal(Config.load(nil, nil, nil).enabled, true)
-equal(Config.load(nil, nil, legacy_micro).remote, "micro")
-equal(Config.load(nil, legacy_zero, nil).enabled, false)
-local existing = Config.load({ enabled = false, remote = "micro", profiles = { micro = legacy_micro } }, {}, {})
+-- No saved settings gives the defaults; saved settings are loaded as saved.
+local defaults = Config.load(nil)
+equal(defaults.enabled, true)
+equal(defaults.remote, "zero2")
+equal(defaults.profiles.zero2.mappings.up, "Up")
+local existing = Config.load({ enabled = false, remote = "micro", profiles = { micro = { mappings = { b = "Press" } } } })
 equal(existing.enabled, false)
 equal(existing.remote, "micro")
 equal(existing.profiles.micro.mappings.b, "Press")
@@ -546,6 +536,21 @@ for _, malformed in ipairs({ "1", -1, 0.5, true }) do
 end
 equal(Config.isNewer({ schema = Config.SCHEMA }), false)
 equal(Config.isNewer({ schema = Config.SCHEMA + 1 }), true)
+
+-- Settings from the old standalone plugins are no longer imported.
+saved[setting] = nil
+local standalone = { enabled = true, mappings = { b = "Press" } }
+saved.eightbitdo_micro = standalone
+hooks = {}
+Device.hasKeys, Device.hasDPad = no, no
+Zero2 = dofile(directory .. "main.lua")
+plugin = Zero2:new{ ui = ui }
+drain()
+equal(saved[setting].remote, "zero2", "Fresh install starts with defaults")
+equal(saved[setting].profiles.micro.mappings.b, "Back", "Standalone assignments are not imported")
+equal(saved.eightbitdo_micro, standalone, "Standalone settings are left alone")
+equal(standalone.mappings.b, "Press")
+saved.eightbitdo_micro = nil
 
 -- A newer build's settings are used but never overwritten by this build.
 local newer = { schema = Config.SCHEMA + 1, enabled = true, remote = profile, future = { kept = true },

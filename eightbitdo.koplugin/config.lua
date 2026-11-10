@@ -161,22 +161,11 @@ function Config.normalize(saved)
     return result
 end
 
-function Config.load(saved, old_zero2, old_micro)
-    -- A combined settings table always wins over legacy settings, even when
-    -- disabled. Migration copies data and leaves legacy settings untouched.
-    if type(saved) == "table" then
-        if Config.isNewer(saved) then return Config.normalize(saved) end
-        return Config.normalize(Config.migrate(saved))
-    end
-    local zero2, micro = asTable(old_zero2), asTable(old_micro)
-    local zero_enabled = type(old_zero2) == "table" and zero2.enabled ~= false
-    local micro_enabled = type(old_micro) == "table" and micro.enabled ~= false
-    return Config.normalize{
-        enabled = (type(old_zero2) ~= "table" and type(old_micro) ~= "table")
-            or zero_enabled or micro_enabled,
-        remote = micro_enabled and not zero_enabled and "micro" or "zero2",
-        profiles = { zero2 = zero2, micro = micro },
-    }
+-- Loads saved settings, upgrading older schemas; no settings gives defaults.
+function Config.load(saved)
+    if type(saved) ~= "table" then return Config.normalize(nil) end
+    if Config.isNewer(saved) then return Config.normalize(saved) end
+    return Config.normalize(Config.migrate(saved))
 end
 
 return Config

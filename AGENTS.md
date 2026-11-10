@@ -26,7 +26,7 @@ limitations honestly instead of inventing gesture coordinates.
 - `eightbitdo.koplugin/main.lua`: event translation, key bindings, Dispatcher
   integration, menus, settings persistence, and lifecycle handling.
 - `eightbitdo.koplugin/config.lua`: button definitions, Linux key codes,
-  defaults, settings normalization, and legacy migration.
+  defaults, settings normalization, and schema migration.
 - `eightbitdo.koplugin/_meta.lua`: plugin metadata and version.
 - `README.md`: installation, mappings, limitations, and development instructions.
 - `eightbitdo.koplugin/README.md`: packaged copy of the root README; keep them
@@ -52,9 +52,12 @@ limitations honestly instead of inventing gesture coordinates.
   removed in 0.5.0 by request; do not reintroduce it without a task reason.
   Reset only the profile whose assignment menu was opened. Menu callbacks must
   keep targeting that profile even if the active remote subsequently changes.
-- Keep settings under `eightbitdo_remotes`. Preserve migration from
-  `eightbitdo_zero2` and `eightbitdo_micro`, without modifying or aliasing the
-  legacy settings. Existing combined settings take precedence.
+- The plugin and its standalone predecessors were never publicly released
+  before 1.0. Settings from the standalone plugins (`eightbitdo_zero2`,
+  `eightbitdo_micro`) are deliberately not imported; do not add import code or
+  user-facing upgrade instructions for them or for pre-1.0 builds.
+- Keep settings under `eightbitdo_remotes`. Schema migrations for earlier
+  builds of this plugin stay (see below).
 - The stored settings shape is locked by `Config.SCHEMA` (documented in
   `config.lua`). Any change to that shape must bump `Config.SCHEMA` and add a
   `Config.migrations[n]` step for the new number; never renumber or delete
@@ -148,5 +151,6 @@ without an extra nested plugin folder.
 When the device still shows old menus, first check the build number under
 **8BitDo remotes → Help**, installation nesting, and whether KOReader was fully
 exited before overwriting the plugin. Do not assume the current archive is loaded.
-Upgrades must preserve settings. The standalone Zero 2 and Micro plugins must
-be disabled or removed and KOReader restarted to avoid competing hooks.
+Upgrades must preserve settings. If the old standalone Zero 2 or Micro
+plugins are present on a test device, disable or remove them and restart
+KOReader: their input hooks compete with this plugin.
