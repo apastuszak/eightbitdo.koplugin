@@ -6,6 +6,13 @@ and versions follow [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [1.0.1] - 2026-11-10
+
+### Changed
+
+- The README shows screenshots of where to find the plugin, its menu, the
+  remote selector and each remote's button assignments. No plugin behavior
+  changed.
 ## [1.0.0] - 2026-11-10
 
 First public release.
@@ -127,6 +134,7 @@ First public release.
   their settings untouched.
 - The build number in **8BitDo remotes → Help**.
 
+[1.0.1]: dist/eightbitdo-1.0.1.koplugin.zip
 [1.0.0]: dist/eightbitdo-1.0.0.koplugin.zip
 [0.7.3]: dist/eightbitdo-0.7.3.koplugin.zip
 [0.7.2]: dist/eightbitdo-0.7.2.koplugin.zip

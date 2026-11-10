@@ -4,7 +4,7 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 ## Install
 
-Current plugin build: **1.0.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-1.0.0.koplugin.zip`.
+Current plugin build: **1.0.1**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-1.0.1.koplugin.zip`.
 
 With the [App Store plugin](https://github.com/omer-faruq/appstore.koplugin), open **Tools → App Store → Plugins**, search for **eightbitdo**, install it, restart KOReader, and continue from step 4. The App Store can also update the plugin later.
 
@@ -16,11 +16,18 @@ To install manually:
 4. Pair your remote with your reader in HID keyboard mode, using the reader's Bluetooth settings. Both remotes must be in keyboard mode; in any other mode they send game-controller buttons that the plugin cannot use.
    - **8BitDo Micro:** set the small switch on the bottom of the remote to **K**, then turn it on.
    - **8BitDo Zero 2:** hold the right bumper (**R**) while turning the remote on.
-5. Open **8BitDo remotes → Remote** and select **8BitDo Zero 2** or **8BitDo Micro**. Open **Button assignments** to customize its buttons.
+5. Open KOReader's top menu. The plugin is listed as **NEW: 8BitDo remotes** in the first tab. Open **8BitDo remotes → Remote** and select **8BitDo Zero 2** or **8BitDo Micro**, then open **Button assignments** to customize its buttons.
+
+<p>
+  <img src="screenshots/menu.jpg" alt="KOReader's file browser menu, first tab, with NEW: 8BitDo remotes near the bottom" width="400">
+  <img src="screenshots/pick-remote.jpg" alt="The Remote submenu with 8BitDo Zero 2 and 8BitDo Micro, Micro checked" width="400">
+</p>
 
 Only the selected profile translates input. Switching applies immediately without restarting or erasing settings. Release held buttons before switching. Both remotes use overlapping codes, so selecting the remote is manual; the plugin cannot identify the controller from the code alone.
 
 ## Settings
+
+<img src="screenshots/main-menu.jpg" alt="The 8BitDo remotes menu: Enable remote mappings, Remote, Button assignments and Help" width="400">
 
 The menu provides a global **Enable remote mappings** toggle, a **Remote** selector, and per-remote button assignments. Resetting assignments resets only the profile whose assignments menu you opened, preserving the other profile. New installations start enabled with Zero 2 selected.
 
@@ -79,6 +86,13 @@ Micro's Star button sends no keyboard event in keyboard mode and is omitted from
 
 ## Available assignments
 
+**Button assignments** lists every button of the selected remote with the code your reader receives and its current assignment. These screenshots were taken on a Nook, so the codes are Android keycodes, and several buttons have custom assignments such as **File browser** and frontlight brightness.
+
+| 8BitDo Zero 2 | 8BitDo Micro |
+| --- | --- |
+| <img src="screenshots/zero-2-page-1.jpg" alt="Zero 2 button assignments, page 1: D-pad, bumpers, Y, A, X and B" width="400"> | <img src="screenshots/micro-page-1.jpg" alt="Micro button assignments, page 1: D-pad, bumpers, Y, A, X and B" width="400"> |
+| <img src="screenshots/zero-2-page-2.jpg" alt="Zero 2 button assignments, page 2: Reset this remote's button assignments" width="400"> | <img src="screenshots/micro-page-2.jpg" alt="Micro button assignments, page 2: L2, R2, Minus, Plus, Capture and Reset" width="400"> |
+
 Every emitting button can be assigned **Next page**, **Previous page**, **Up**, **Down**, **Left**, **Right**, **Select**, **Back**, **Menu**, or **Ignore button**. Native KOReader keys determine behavior on the active screen or dialog. Directions follow KOReader's normal rotation handling; bumpers provide dedicated page turns.
 
 For the full action list offered under **Gesture Manager → Tap corner**, open **8BitDo remotes → Button assignments → [button]**. The action categories appear directly in the button menu: **General**, **Device**, **Screen and lights**, **File browser**, **Reader**, and document-specific categories. Basic keys are grouped under **Native navigation keys**. This uses KOReader's own Dispatcher picker, including actions registered by other enabled plugins. The complete action picker is available, including multiple actions, numeric parameters, action sequences and QuickMenus. There is no one-action restriction. Numeric settings such as brightness and font-size changes use the same parameter controls as gestures.
@@ -95,7 +109,7 @@ Your operating system and KOReader's input integration must already deliver the 
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v1.0.0**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v1.0.1**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 
