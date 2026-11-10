@@ -144,7 +144,7 @@ for _, item in ipairs(items) do
     assert(not (item.text or ""):find("repeat", 1, true), "No repeat setting in the menu")
 end
 items[4].callback()
-assert(UIManager.last_widget.text:find("v1.0.1", 1, true), "Help identifies installed build")
+assert(UIManager.last_widget.text:find("v1.0.2", 1, true), "Help identifies installed build")
 assert(not UIManager.last_widget.text:find("repeat", 1, true), "Help does not mention repeat")
 assert(not UIManager.last_widget.text:find("standalone", 1, true), "Help has no upgrade instructions")
 assert(UIManager.last_widget.text:find("switch on the bottom to K", 1, true), "Help explains Micro keyboard mode")
