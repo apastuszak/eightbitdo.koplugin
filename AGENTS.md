@@ -33,6 +33,8 @@ limitations honestly instead of inventing gesture coordinates.
   identical.
 - `tests/run.lua`: standalone LuaJIT regression suite with KOReader service stubs.
 - `dist/`: installable archives containing a single `eightbitdo.koplugin/` folder.
+- `LICENSE`: GNU AGPL-3.0, matching KOReader. Keep the text verbatim.
+- `CHANGELOG.md`: user-facing release notes in Keep a Changelog format.
 - `AGENTS.md`: these repository instructions. `CLAUDE.md` only points here;
   edit this file rather than duplicating guidance there.
 - `2-pocketbook-bt-keys.lua`: separate PocketBook key patch. It is not part of
@@ -112,7 +114,9 @@ using `eightbitdo-VERSION.koplugin.zip`. Keep the version consistent in
 `main.lua`'s `VERSION` constant (shown in Help), `_meta.lua`, both READMEs, and
 the Help assertion in `tests/run.lua`. Do not silently change an older versioned
 release archive: a packaged-code change after a release needs a version bump and
-a new versioned archive.
+a new versioned archive. Record user-visible changes under **Unreleased** in
+`CHANGELOG.md` as they land, and move them under the new version and date when
+releasing.
 
 From the repository root:
 
