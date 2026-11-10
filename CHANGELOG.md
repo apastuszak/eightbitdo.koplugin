@@ -6,6 +6,13 @@ and versions follow [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [1.0.3] - 2026-11-10
+
+### Fixed
+
+- The two install screenshots in the README still appeared side by side on
+  GitHub, because images inside a list item were not given their own
+  paragraphs. They now stack like the rest. No plugin behavior changed.
 ## [1.0.2] - 2026-11-10
 
 ### Changed
@@ -140,6 +147,7 @@ First public release.
   their settings untouched.
 - The build number in **8BitDo remotes → Help**.
 
+[1.0.3]: dist/eightbitdo-1.0.3.koplugin.zip
 [1.0.2]: dist/eightbitdo-1.0.2.koplugin.zip
 [1.0.1]: dist/eightbitdo-1.0.1.koplugin.zip
 [1.0.0]: dist/eightbitdo-1.0.0.koplugin.zip

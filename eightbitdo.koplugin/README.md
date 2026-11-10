@@ -4,7 +4,7 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 ## Install
 
-Current plugin build: **1.0.2**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-1.0.2.koplugin.zip`.
+Current plugin build: **1.0.3**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-1.0.3.koplugin.zip`.
 
 With the [App Store plugin](https://github.com/omer-faruq/appstore.koplugin), open **Tools → App Store → Plugins**, search for **eightbitdo**, install it, restart KOReader, and continue from step 4. The App Store can also update the plugin later.
 
@@ -18,9 +18,9 @@ To install manually:
    - **8BitDo Zero 2:** hold the right bumper (**R**) while turning the remote on.
 5. Open KOReader's top menu. The plugin is listed as **NEW: 8BitDo remotes** in the first tab. Open **8BitDo remotes → Remote** and select **8BitDo Zero 2** or **8BitDo Micro**, then open **Button assignments** to customize its buttons.
 
-   <img src="screenshots/menu.jpg" alt="KOReader's file browser menu, first tab, with NEW: 8BitDo remotes near the bottom" width="400">
+   <p><img src="screenshots/menu.jpg" alt="KOReader's file browser menu, first tab, with NEW: 8BitDo remotes near the bottom" width="400"></p>
 
-   <img src="screenshots/pick-remote.jpg" alt="The Remote submenu with 8BitDo Zero 2 and 8BitDo Micro, Micro checked" width="400">
+   <p><img src="screenshots/pick-remote.jpg" alt="The Remote submenu with 8BitDo Zero 2 and 8BitDo Micro, Micro checked" width="400"></p>
 
 Only the selected profile translates input. Switching applies immediately without restarting or erasing settings. Release held buttons before switching. Both remotes use overlapping codes, so selecting the remote is manual; the plugin cannot identify the controller from the code alone.
 
@@ -115,7 +115,7 @@ Your operating system and KOReader's input integration must already deliver the 
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v1.0.2**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v1.0.3**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 
