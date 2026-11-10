@@ -6,10 +6,22 @@ and versions follow [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.7.0] - 2026-11-10
+
 ### Added
 
 - Licensed under the GNU Affero General Public License v3.0 (`LICENSE`).
 - This changelog.
+
+### Fixed
+
+- Remotes now work with KOReader on Android, including Nook readers. Android
+  delivers Android keycodes rather than Linux codes, so most buttons were not
+  recognized and some did the wrong thing. **Button assignments** now shows
+  the code the reader actually receives.
+- Holding a button on Android no longer repeats it. Android sends a held key
+  as repeated presses without a release; these are now ignored like Linux
+  key repeats.
 
 ## [0.6.0] - 2026-11-09
 
@@ -73,6 +85,7 @@ and versions follow [Semantic Versioning](https://semver.org/).
   their settings untouched.
 - The build number in **8BitDo remotes → Help**.
 
+[0.7.0]: dist/eightbitdo-0.7.0.koplugin.zip
 [0.6.0]: dist/eightbitdo-0.6.0.koplugin.zip
 [0.5.0]: dist/eightbitdo-0.5.0.koplugin.zip
 [0.4.0]: dist/eightbitdo-0.4.0.koplugin.zip

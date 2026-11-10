@@ -4,7 +4,7 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 ## Install or upgrade
 
-Current plugin build: **0.6.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.6.0.koplugin.zip`.
+Current plugin build: **0.7.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.7.0.koplugin.zip`.
 
 1. Exit KOReader. If you installed either standalone plugin, remove `koreader/plugins/zero2.koplugin` and `koreader/plugins/micro.koplugin` from the device. Keep your KOReader settings so their assignments can be imported.
 2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
@@ -26,43 +26,47 @@ The settings entry carries a schema number (currently 2). Settings from earlier 
 
 If only Micro was enabled, Micro is selected. Otherwise Zero 2 is selected, including when both old profiles were enabled. Mapping stays disabled if all installed legacy profiles were disabled. New installations default to enabled with Zero 2 selected.
 
+## Platforms and key codes
+
+Tested on a PocketBook Era Lite with the Zero 2. On Linux-based readers (PocketBook, Kobo, Kindle and similar), KOReader receives Linux `EV_KEY` codes. On Android, including Nook readers, KOReader receives Android keycodes instead, which use different numbers for the same letters; the plugin detects Android and uses the Android column below. **Button assignments** shows the code your reader actually receives. Android sends a held button as repeated presses, and the plugin ignores those just as it ignores Linux key repeats.
+
 ## Zero 2 defaults
 
-| Button | Linux EV_KEY code | KOReader key | Default behavior |
-| --- | ---: | --- | --- |
-| D-pad up | 32 | Up | Navigate up |
-| D-pad down | 46 | Down | Navigate down |
-| D-pad left | 18 | Left | Navigate left |
-| D-pad right | 33 | Right | Navigate right |
-| Left bumper | 37 | LPgBack | Previous page |
-| Right bumper | 50 | LPgFwd | Next page |
-| Y | 23 | LPgBack | Previous page |
-| A | 34 | Press | Select |
-| X | 36 | Menu | Open menu |
-| B | 35 | Back | Back/close |
+| Button | Linux EV_KEY code | Android keycode | KOReader key | Default behavior |
+| --- | ---: | ---: | --- | --- |
+| D-pad up | 32 | 32 | Up | Navigate up |
+| D-pad down | 46 | 31 | Down | Navigate down |
+| D-pad left | 18 | 33 | Left | Navigate left |
+| D-pad right | 33 | 34 | Right | Navigate right |
+| Left bumper | 37 | 39 | LPgBack | Previous page |
+| Right bumper | 50 | 41 | LPgFwd | Next page |
+| Y | 23 | 37 | LPgBack | Previous page |
+| A | 34 | 35 | Press | Select |
+| X | 36 | 38 | Menu | Open menu |
+| B | 35 | 36 | Back | Back/close |
 
 ## Micro defaults
 
 The screenshot's keyboard letters are translated into Linux `EV_KEY` codes, checked against `linux/input-event-codes.h`. These are Linux codes, not numeric USB HID usage IDs.
 
-| Micro button | Screenshot key | Linux code | Default assignment |
-| --- | --- | ---: | --- |
-| D-pad up | C | 46 | Up |
-| D-pad down | D | 32 | Down |
-| D-pad left | E | 18 | Left |
-| D-pad right | F | 33 | Right |
-| L | K | 37 | Previous page |
-| L2 | L | 38 | Previous page |
-| R | M | 50 | Next page |
-| R2 | R | 19 | Next page |
-| Minus (−) | N | 49 | Back |
-| Plus (+) | O | 24 | Menu |
-| X | H | 35 | Menu |
-| A | G | 34 | Select |
-| Y | I | 23 | Previous page |
-| B | J | 36 | Back |
-| Capture (checkerboard) | S | 31 | Ignore button |
-| Star | Null | — | No keyboard event to map |
+| Micro button | Screenshot key | Linux code | Android keycode | Default assignment |
+| --- | --- | ---: | ---: | --- |
+| D-pad up | C | 46 | 31 | Up |
+| D-pad down | D | 32 | 32 | Down |
+| D-pad left | E | 18 | 33 | Left |
+| D-pad right | F | 33 | 34 | Right |
+| L | K | 37 | 39 | Previous page |
+| L2 | L | 38 | 40 | Previous page |
+| R | M | 50 | 41 | Next page |
+| R2 | R | 19 | 46 | Next page |
+| Minus (−) | N | 49 | 42 | Back |
+| Plus (+) | O | 24 | 43 | Menu |
+| X | H | 35 | 36 | Menu |
+| A | G | 34 | 35 | Select |
+| Y | I | 23 | 37 | Previous page |
+| B | J | 36 | 38 | Back |
+| Capture (checkerboard) | S | 31 | 47 | Ignore button |
+| Star | Null | — | — | No keyboard event to map |
 
 Micro's Star button has no keyboard event in the supplied profile and is omitted from the menu. Capture defaults to Ignore button and can be reassigned. If you customized Micro's keyboard profile, restore the listed letters before using this mapping.
 
@@ -85,7 +89,7 @@ Your operating system and KOReader's input integration must already deliver the 
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.6.0**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.7.0**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 

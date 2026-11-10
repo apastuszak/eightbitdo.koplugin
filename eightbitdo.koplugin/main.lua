@@ -10,13 +10,15 @@ local directory = debug.getinfo(1, "S").source:match("^@(.*/)")
 local Config = dofile(directory .. "config.lua")
 local SETTING = "eightbitdo_remotes"
 local EV_KEY = 1
-local VERSION = "0.6.0"
-local state = { capabilities = {} }
+local VERSION = "0.7.0"
+-- KOReader on Android (including Nook) delivers Android keycodes.
+local ANDROID = type(Device.isAndroid) == "function" and Device:isAndroid() and true or false
+local state = { capabilities = {}, held = {} }
 local by_code = {}
 for profile_index, profile in ipairs(Config.order) do
     by_code[profile] = {}
     for index, button in ipairs(Config.buttons[profile]) do
-        by_code[profile][button.code] = {
+        by_code[profile][Config.deviceCode(button, ANDROID)] = {
             button = button,
             virtual_code = 0x7000 + profile_index * 0x100 + index,
             key = "EightBitDo_" .. profile .. "_" .. button.id,
@@ -51,8 +53,15 @@ local function adjustEvent(input, ev)
     local key = settings.mappings[mapping.button.id]
     if settings.actions[mapping.button.id] ~= nil then key = mapping.key end
     -- Held buttons never repeat: drop autorepeat events along with ignored
-    -- buttons. Press and release still pass through.
-    if key == "none" or ev.value == 2 then
+    -- buttons. Press and release still pass through. Linux marks repeats
+    -- with value 2; Android sends them as further presses without a release.
+    local repeated = ev.value == 2 or (ev.value == 1 and state.held[ev.code])
+    if ev.value == 1 then
+        state.held[ev.code] = true
+    elseif ev.value == 0 then
+        state.held[ev.code] = nil
+    end
+    if key == "none" or repeated then
         key = nil
     end
     -- External Keyboard may replace event_map, so refresh each private entry
@@ -177,6 +186,8 @@ end
 function Remotes:setEnabled(enabled)
     local keys, dpad = capabilities()
     state.settings.enabled = enabled
+    -- Releases are not tracked while disabled; start afresh.
+    state.held = {}
     self:save()
     updateCapabilities(keys, dpad)
 end
@@ -184,6 +195,7 @@ end
 function Remotes:selectRemote(profile)
     if not Config.names[profile] then return end
     state.settings.remote = profile
+    state.held = {}
     self:save()
 end
 
@@ -288,7 +300,7 @@ function Remotes:getAssignmentsMenu()
         local button = definition
         items[#items + 1] = {
             text_func = function()
-                return string.format("%s (%d): %s", button.label, button.code,
+                return string.format("%s (%d): %s", button.label, Config.deviceCode(button, ANDROID),
                     self:getButtonLabel(profile, button.id))
             end,
             sub_item_table_func = function() return self:getButtonMenu(profile, button) end,

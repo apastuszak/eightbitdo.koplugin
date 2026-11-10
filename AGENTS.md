@@ -56,8 +56,15 @@ limitations honestly instead of inventing gesture coordinates.
   `Config.migrations[n]` step for the new number; never renumber or delete
   existing steps. Settings with a newer schema are used read-only and must never
   be saved over. Update the shape assertions in `tests/run.lua` with the bump.
-- Interpret codes as Linux `EV_KEY` codes, not USB HID usage IDs. Micro Star
-  emits no key in the supplied profile; do not map it to key code zero.
+- `Config.buttons` stores Linux `EV_KEY` codes, not USB HID usage IDs. On
+  Android (`Device:isAndroid()`, which includes Nook), koreader-base delivers
+  Android KeyEvent keycodes in `EV_KEY` events, so match buttons through
+  `Config.deviceCode`. Micro Star emits no key in the supplied profile; do not
+  map it to key code zero.
+- Android reports a held key as repeated presses (value 1) without releases,
+  never value 2. Treat a press of a button that is still down as a repeat, and
+  clear held-button state whenever releases may have been missed (mappings
+  toggled, remote switched).
 - Translate through private virtual codes without overwriting the original
   keyboard mappings. Preserve unrelated keys, touch events, and power events.
 - Route custom actions through KOReader's normal key handling and Dispatcher.

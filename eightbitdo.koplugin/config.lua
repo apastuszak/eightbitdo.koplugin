@@ -1,5 +1,6 @@
 -- Linux EV_KEY codes. Zero 2 codes supplied by the user; Micro letters
 -- transcribed from the supplied screenshot and translated via Linux headers.
+-- Android uses different numbers; see Config.deviceCode below.
 local _ = require("gettext")
 
 local Config = {}
@@ -52,6 +53,24 @@ Config.actions = {
     { key = "none",    label = _("Ignore button") },
 }
 
+-- Button codes above are Linux EV_KEY codes. On Android, KOReader receives
+-- Android KeyEvent keycodes instead (KEYCODE_A = 29 through KEYCODE_Z = 54),
+-- so each letter's Linux code is translated before matching.
+local LINUX_LETTER_CODES = {
+    A = 30, B = 48, C = 46, D = 32, E = 18, F = 33, G = 34, H = 35, I = 23,
+    J = 36, K = 37, L = 38, M = 50, N = 49, O = 24, P = 25, Q = 16, R = 19,
+    S = 31, T = 20, U = 22, V = 47, W = 17, X = 45, Y = 21, Z = 44,
+}
+Config.android_codes = {}
+for letter, linux_code in pairs(LINUX_LETTER_CODES) do
+    Config.android_codes[linux_code] = 29 + letter:byte() - ("A"):byte()
+end
+
+-- The code KOReader delivers for a button on this platform.
+function Config.deviceCode(button, android)
+    if android then return Config.android_codes[button.code] end
+    return button.code
+end
 
 local function asTable(value)
     return type(value) == "table" and value or {}

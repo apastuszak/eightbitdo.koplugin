@@ -84,10 +84,17 @@ local function drain()
     queue = {}
     for _, callback in ipairs(pending) do callback() end
 end
+-- event(code) is a tap: the press is reported, then a release follows.
+-- Pass an explicit value (1 press, 0 release, 2 repeat) for a single event.
 local function event(code, value, event_type)
     local ev = { type = event_type or 1, code = code, value = value or 1 }
     for _, hook in ipairs(hooks) do hook(Device.input, ev) end
-    return ev, Device.input.event_map[ev.code]
+    local key = Device.input.event_map[ev.code]
+    if value == nil and ev.type == 1 then
+        local release = { type = 1, code = code, value = 0 }
+        for _, hook in ipairs(hooks) do hook(Device.input, release) end
+    end
+    return ev, key
 end
 local Zero2 = dofile(directory .. "main.lua")
 local registered = 0
@@ -138,7 +145,7 @@ for _, item in ipairs(items) do
     assert(not (item.text or ""):find("repeat", 1, true), "No repeat setting in the menu")
 end
 items[4].callback()
-assert(UIManager.last_widget.text:find("v0.6.0", 1, true), "Help identifies installed build")
+assert(UIManager.last_widget.text:find("v0.7.0", 1, true), "Help identifies installed build")
 assert(not UIManager.last_widget.text:find("repeat", 1, true), "Help does not mention repeat")
 local assignments = items[3].sub_item_table_func()
 local actions = assignments[1].sub_item_table_func()[1].sub_item_table_func() -- Native D-pad up choices.
@@ -148,6 +155,7 @@ equal(saved[setting].profiles[profile].mappings.up, "LPgFwd", "Save assignment i
 assert(assignments[1].text_func():find("Next page", 1, true))
 actions[#Config.actions].callback() -- Ignore button, including releases and repeats.
 for _, value in ipairs({ 0, 1, 2 }) do equal(select(2, event(up_code, value)), nil) end
+event(up_code, 0) -- Release the held button.
 assignments[#assignments].callback() -- Reset.
 equal(select(2, event(up_code)), "Up")
 
@@ -437,6 +445,57 @@ end
 equal(translated["8BitDo Zero 2"], nil, "Product names are not translated")
 equal(translated["8BitDo Micro"], nil)
 
+-- Android (including Nook) delivers Android keycodes (KEYCODE_A = 29) and
+-- repeats a held key as further presses without a release.
+local linux_letters = { C = 46, D = 32, E = 18, F = 33, G = 34, H = 35, I = 23, J = 36,
+    K = 37, L = 38, M = 50, N = 49, O = 24, R = 19, S = 31 }
+for letter, linux in pairs(linux_letters) do
+    equal(Config.android_codes[linux], 29 + letter:byte() - ("A"):byte(), "Android code for " .. letter)
+end
+for _, id in ipairs(Config.order) do
+    local seen = {}
+    for _, button in ipairs(Config.buttons[id]) do
+        local code = Config.deviceCode(button, true)
+        assert(code, "Android code for " .. id .. " " .. button.id)
+        assert(not seen[code], "Android codes unique within " .. id)
+        seen[code] = true
+        equal(Config.deviceCode(button, false), button.code, "Linux code unchanged")
+    end
+end
+equal(Config.deviceCode(Config.buttons.zero2[2], true), 31, "Zero 2 D-pad down (C) is Android 31")
+hooks = {}
+Device.hasKeys, Device.hasDPad = no, no
+Device.isAndroid = function() return true end
+local AndroidRemotes = dofile(directory .. "main.lua")
+local android_plugin = AndroidRemotes:new{ ui = ui }
+android_plugin:selectRemote(profile)
+drain()
+for _, button in ipairs(Config.buttons[profile]) do
+    local expected_key = button.default ~= "none" and button.default or nil
+    equal(select(2, event(Config.deviceCode(button, true))), expected_key, "Android " .. button.id)
+end
+equal(event(50).code, 50, "Linux codes are not matched on Android")
+local android_up = Config.deviceCode(Config.buttons[profile][1], true)
+assert(android_plugin:getAssignmentsMenu()[1].text_func():find("(" .. android_up .. ")", 1, true),
+    "Menu shows the code this device sends")
+equal(select(2, event(android_up, 1)), "Up")
+equal(select(2, event(android_up, 1)), nil, "Android repeat press dropped")
+equal(select(2, event(android_up, 1)), nil)
+equal(select(2, event(android_up, 0)), "Up", "Release still delivered")
+equal(select(2, event(android_up, 1)), "Up", "Next press after release works")
+android_plugin:setEnabled(false)
+android_plugin:setEnabled(true)
+equal(select(2, event(android_up, 1)), "Up", "Release missed while disabled does not swallow a press")
+android_plugin:selectRemote(profile)
+equal(select(2, event(android_up, 1)), "Up", "Switching remotes clears held buttons")
+event(android_up, 0)
+Device.isAndroid = nil
+hooks = {}
+Device.hasKeys, Device.hasDPad = no, no
+Zero2 = dofile(directory .. "main.lua")
+plugin = Zero2:new{ ui = ui }
+drain()
+
 -- Settings schema: the stored shape is locked to Config.SCHEMA.
 equal(Config.SCHEMA, 2)
 equal(saved[setting].schema, Config.SCHEMA, "Saved settings carry the schema")
@@ -507,4 +566,4 @@ equal(saves, save_total, "Newer settings never saved over")
 equal(saved[setting], newer)
 equal(newer.remote, profile)
 equal(newer.future.kept, true)
-print(profile .. " PASS: settings schema, migration, downgrade protection")
+print(profile .. " PASS: Android keycodes, settings schema, migration, downgrade protection")
