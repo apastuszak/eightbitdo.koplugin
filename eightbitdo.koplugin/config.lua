@@ -1,5 +1,6 @@
--- Linux EV_KEY codes. Zero 2 codes supplied by the user; Micro letters
--- transcribed from the supplied screenshot and translated via Linux headers.
+-- Linux EV_KEY codes. Micro letters transcribed from 8BitDo's screenshot and
+-- translated via Linux headers. The Zero 2 sends the same letters for the
+-- buttons it shares with the Micro (confirmed on hardware in 0.7.3).
 -- Android uses different numbers; see Config.deviceCode below.
 local _ = require("gettext")
 
@@ -9,16 +10,16 @@ Config.order = { "zero2", "micro" }
 Config.names = { zero2 = "8BitDo Zero 2", micro = "8BitDo Micro" }
 Config.buttons = {
     zero2 = {
-    { id = "up",    label = _("D-pad up"),     code = 32, default = "Up" },
-    { id = "down",  label = _("D-pad down"),   code = 46, default = "Down" },
+    { id = "up",    label = _("D-pad up"),     code = 46, default = "Up" }, -- C
+    { id = "down",  label = _("D-pad down"),   code = 32, default = "Down" }, -- D
     { id = "left",  label = _("D-pad left"),   code = 18, default = "Left" },
     { id = "right", label = _("D-pad right"),  code = 33, default = "Right" },
     { id = "l",     label = _("Left bumper"),  code = 37, default = "LPgBack" },
     { id = "r",     label = _("Right bumper"), code = 50, default = "LPgFwd" },
     { id = "y",     label = _("Y"),            code = 23, default = "LPgBack" },
     { id = "a",     label = _("A"),            code = 34, default = "Press" },
-    { id = "x",     label = _("X"),            code = 36, default = "Menu" },
-    { id = "b",     label = _("B"),            code = 35, default = "Back" },
+    { id = "x",     label = _("X"),            code = 35, default = "Menu" }, -- H
+    { id = "b",     label = _("B"),            code = 36, default = "Back" }, -- J
 },
     micro = {
     { id = "up",      label = _("D-pad up"),       code = 46, default = "Up" }, -- C

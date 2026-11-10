@@ -4,7 +4,7 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 ## Install
 
-Current plugin build: **0.7.2**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.7.2.koplugin.zip`.
+Current plugin build: **0.7.3**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.7.3.koplugin.zip`.
 
 1. Exit KOReader.
 2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
@@ -30,16 +30,16 @@ Tested on a PocketBook Era Lite with the Zero 2. On Linux-based readers (PocketB
 
 | Button | Linux EV_KEY code | Android keycode | KOReader key | Default behavior |
 | --- | ---: | ---: | --- | --- |
-| D-pad up | 32 | 32 | Up | Navigate up |
-| D-pad down | 46 | 31 | Down | Navigate down |
+| D-pad up | 46 | 31 | Up | Navigate up |
+| D-pad down | 32 | 32 | Down | Navigate down |
 | D-pad left | 18 | 33 | Left | Navigate left |
 | D-pad right | 33 | 34 | Right | Navigate right |
 | Left bumper | 37 | 39 | LPgBack | Previous page |
 | Right bumper | 50 | 41 | LPgFwd | Next page |
 | Y | 23 | 37 | LPgBack | Previous page |
 | A | 34 | 35 | Press | Select |
-| X | 36 | 38 | Menu | Open menu |
-| B | 35 | 36 | Back | Back/close |
+| X | 35 | 36 | Menu | Open menu |
+| B | 36 | 38 | Back | Back/close |
 
 ## Micro defaults
 
@@ -85,7 +85,7 @@ Your operating system and KOReader's input integration must already deliver the 
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v0.7.2**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v0.7.3**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 

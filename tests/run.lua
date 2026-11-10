@@ -3,9 +3,10 @@ local profile = arg[1] or "zero2"
 assert(profile == "zero2" or profile == "micro", "Usage: luajit tests/run.lua [zero2|micro]")
 local directory = "eightbitdo.koplugin/"
 local setting = "eightbitdo_remotes"
-local up_code = profile == "micro" and 46 or 32
-local back_code = profile == "micro" and 36 or 35
-local original_letter = profile == "micro" and "C" or "D"
+-- Both remotes send C for D-pad up and J for B.
+local up_code = 46
+local back_code = 36
+local original_letter = "C"
 local translated = {}
 package.loaded.gettext = function(text) translated[text] = true; return text end
 local Config = dofile(directory .. "config.lua")
@@ -115,11 +116,9 @@ Zero2:new{ ui = ui }
 drain()
 equal(#broadcasts, 1, "Reopening does not rebuild the file manager")
 
-local expected = { [32] = "Up", [46] = "Down", [18] = "Left", [33] = "Right",
-    [37] = "LPgBack", [50] = "LPgFwd", [23] = "LPgBack", [34] = "Press", [36] = "Menu", [35] = "Back" }
+local expected = { [46] = "Up", [32] = "Down", [18] = "Left", [33] = "Right",
+    [37] = "LPgBack", [50] = "LPgFwd", [23] = "LPgBack", [34] = "Press", [35] = "Menu", [36] = "Back" }
 if profile == "micro" then
-    expected[32], expected[46] = "Down", "Up"
-    expected[35], expected[36] = "Menu", "Back"
     expected[38], expected[19] = "LPgBack", "LPgFwd"
     expected[49], expected[24] = "Back", "Menu"
 end
@@ -145,7 +144,7 @@ for _, item in ipairs(items) do
     assert(not (item.text or ""):find("repeat", 1, true), "No repeat setting in the menu")
 end
 items[4].callback()
-assert(UIManager.last_widget.text:find("v0.7.2", 1, true), "Help identifies installed build")
+assert(UIManager.last_widget.text:find("v0.7.3", 1, true), "Help identifies installed build")
 assert(not UIManager.last_widget.text:find("repeat", 1, true), "Help does not mention repeat")
 assert(not UIManager.last_widget.text:find("standalone", 1, true), "Help has no upgrade instructions")
 assert(UIManager.last_widget.text:find("switch on the bottom to K", 1, true), "Help explains Micro keyboard mode")
@@ -237,13 +236,16 @@ local before = saved[setting].profiles[profile].mappings.b
 local other = profile == "micro" and "zero2" or "micro"
 local selector = plugin:getRemoteMenu()
 selector[other == "micro" and 2 or 1].callback()
-equal(select(2, event(46)), other == "micro" and "Up" or "Down")
-equal(select(2, event(35)), other == "micro" and "Menu" or "Back")
+equal(select(2, event(46)), "Up", "Other remote's D-pad up")
+equal(before, "LPgFwd", "This remote's B was reassigned earlier")
+equal(select(2, event(36)), "Back", "Other remote uses its own B assignment")
 equal(event(38).code == 38, other ~= "micro", "Micro-only keys pass through on Zero 2")
 local other_menu = plugin:getAssignmentsMenu()
 other_menu[1].sub_item_table_func()[1].sub_item_table_func()[1].callback()
-equal(select(2, event(other == "micro" and 46 or 32)), "LPgFwd")
+equal(select(2, event(46)), "LPgFwd")
 plugin:selectRemote(profile)
+equal(select(2, event(36)), before, "Own B assignment restored")
+equal(select(2, event(46)), saved[setting].profiles[profile].mappings.up, "Own D-pad up restored")
 equal(saved[setting].profiles[profile].mappings.b, before)
 -- A menu opened for the other profile continues to edit that profile.
 other_menu[#other_menu].callback()
@@ -454,7 +456,13 @@ for _, id in ipairs(Config.order) do
         equal(Config.deviceCode(button, false), button.code, "Linux code unchanged")
     end
 end
-equal(Config.deviceCode(Config.buttons.zero2[2], true), 31, "Zero 2 D-pad down (C) is Android 31")
+equal(Config.deviceCode(Config.buttons.zero2[1], true), 31, "Zero 2 D-pad up (C) is Android 31")
+-- The Zero 2 sends the same letter as the Micro for every shared button.
+local micro_codes = {}
+for _, button in ipairs(Config.buttons.micro) do micro_codes[button.id] = button.code end
+for _, button in ipairs(Config.buttons.zero2) do
+    equal(button.code, micro_codes[button.id], "Zero 2 " .. button.id .. " matches Micro")
+end
 hooks = {}
 Device.hasKeys, Device.hasDPad = no, no
 Device.isAndroid = function() return true end

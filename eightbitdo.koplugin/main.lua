@@ -10,7 +10,7 @@ local directory = debug.getinfo(1, "S").source:match("^@(.*/)")
 local Config = dofile(directory .. "config.lua")
 local SETTING = "eightbitdo_remotes"
 local EV_KEY = 1
-local VERSION = "0.7.2"
+local VERSION = "0.7.3"
 -- KOReader on Android (including Nook) delivers Android keycodes.
 local ANDROID = type(Device.isAndroid) == "function" and Device:isAndroid() and true or false
 local state = { capabilities = {}, held = {} }

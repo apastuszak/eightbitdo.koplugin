@@ -6,6 +6,14 @@ and versions follow [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.7.3] - 2026-11-10
+
+### Fixed
+
+- Zero 2 D-pad up and down were swapped, and so were X and B. The Zero 2
+  sends the same keyboard letters as the Micro (up C, down D, X H, B J); the
+  plugin's table had them reversed. Saved assignments belong to the button,
+  so they now follow the button you pressed.
 ## [0.7.2] - 2026-11-10
 
 ### Removed
@@ -104,6 +112,7 @@ and versions follow [Semantic Versioning](https://semver.org/).
   their settings untouched.
 - The build number in **8BitDo remotes → Help**.
 
+[0.7.3]: dist/eightbitdo-0.7.3.koplugin.zip
 [0.7.2]: dist/eightbitdo-0.7.2.koplugin.zip
 [0.7.1]: dist/eightbitdo-0.7.1.koplugin.zip
 [0.7.0]: dist/eightbitdo-0.7.0.koplugin.zip
