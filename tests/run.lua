@@ -145,8 +145,10 @@ for _, item in ipairs(items) do
     assert(not (item.text or ""):find("repeat", 1, true), "No repeat setting in the menu")
 end
 items[4].callback()
-assert(UIManager.last_widget.text:find("v0.7.0", 1, true), "Help identifies installed build")
+assert(UIManager.last_widget.text:find("v0.7.1", 1, true), "Help identifies installed build")
 assert(not UIManager.last_widget.text:find("repeat", 1, true), "Help does not mention repeat")
+assert(UIManager.last_widget.text:find("switch on the bottom to K", 1, true), "Help explains Micro keyboard mode")
+assert(UIManager.last_widget.text:find("hold the right bumper (R) while turning it on", 1, true), "Help explains Zero 2 keyboard mode")
 local assignments = items[3].sub_item_table_func()
 local actions = assignments[1].sub_item_table_func()[1].sub_item_table_func() -- Native D-pad up choices.
 actions[1].callback() -- Reassign to next page.

@@ -4,12 +4,14 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 ## Install or upgrade
 
-Current plugin build: **0.7.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.7.0.koplugin.zip`.
+Current plugin build: **0.7.1**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.7.1.koplugin.zip`.
 
 1. Exit KOReader. If you installed either standalone plugin, remove `koreader/plugins/zero2.koplugin` and `koreader/plugins/micro.koplugin` from the device. Keep your KOReader settings so their assignments can be imported.
 2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
 3. Restart KOReader. If necessary, enable **8BitDo remotes** in Plugin management and restart again.
-4. Connect your remote in HID keyboard mode (**K** on Micro), using your device's Bluetooth tools.
+4. Pair your remote with your reader in HID keyboard mode, using the reader's Bluetooth settings. Both remotes must be in keyboard mode; in any other mode they send game-controller buttons that the plugin cannot use.
+   - **8BitDo Micro:** set the small switch on the bottom of the remote to **K**, then turn it on.
+   - **8BitDo Zero 2:** hold the right bumper (**R**) while turning the remote on.
 5. Open **8BitDo remotes → Remote** and select **8BitDo Zero 2** or **8BitDo Micro**. Open **Button assignments** to customize its buttons.
 
 Only the selected profile translates input. Switching applies immediately without restarting or erasing settings. Release held buttons before switching. Both remotes use overlapping codes, so selecting the remote is manual; the plugin cannot identify the controller from the code alone.
@@ -85,11 +87,11 @@ Holding a button does not repeat it: each press acts once, including custom acti
 
 ## Requirements and troubleshooting
 
-Your operating system and KOReader's input integration must already deliver the remote's Linux `EV_KEY` events. This plugin maps those events; it does not pair Bluetooth devices, enable Bluetooth, install drivers, or open `/dev/input/event*` devices. Android key codes and gamepad axis events are different formats.
+Your operating system and KOReader's input integration must already deliver the remote's key events (Linux `EV_KEY` codes, or Android keycodes on Android). This plugin maps those events; it does not pair Bluetooth devices, enable Bluetooth, install drivers, or open `/dev/input/event*` devices. Android key codes and gamepad axis events are different formats.
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.7.0**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote and remove the standalone plugins. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. If you still see only the old navigation choices, fully exit KOReader, overwrite `plugins/eightbitdo.koplugin` with this build, restart, and check **Help** for **v0.7.1**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 

@@ -6,6 +6,13 @@ and versions follow [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.7.1] - 2026-11-10
+
+### Changed
+
+- The README and **Help** explain how to put each remote in HID keyboard mode
+  before pairing: the Micro's bottom switch set to **K**, and the Zero 2
+  turned on while holding the right bumper.
 ## [0.7.0] - 2026-11-10
 
 ### Added
@@ -85,6 +92,7 @@ and versions follow [Semantic Versioning](https://semver.org/).
   their settings untouched.
 - The build number in **8BitDo remotes → Help**.
 
+[0.7.1]: dist/eightbitdo-0.7.1.koplugin.zip
 [0.7.0]: dist/eightbitdo-0.7.0.koplugin.zip
 [0.6.0]: dist/eightbitdo-0.6.0.koplugin.zip
 [0.5.0]: dist/eightbitdo-0.5.0.koplugin.zip
