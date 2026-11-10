@@ -4,7 +4,7 @@ One plugin for the **8BitDo Zero 2** and **8BitDo Micro** in HID keyboard mode. 
 
 ## Install
 
-Current plugin build: **0.7.3**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-0.7.3.koplugin.zip`.
+Current plugin build: **1.0.0**, shown in **8BitDo remotes → Help**. The versioned archive is `dist/eightbitdo-1.0.0.koplugin.zip`.
 
 1. Exit KOReader.
 2. Extract **`dist/eightbitdo.koplugin.zip`** into `koreader/plugins/`, or copy the `eightbitdo.koplugin` folder there. The resulting path must be `koreader/plugins/eightbitdo.koplugin/main.lua`.
@@ -24,7 +24,14 @@ Settings are saved under `eightbitdo_remotes` with a format version, so future r
 
 ## Platforms and key codes
 
-Tested on a PocketBook Era Lite with the Zero 2. On Linux-based readers (PocketBook, Kobo, Kindle and similar), KOReader receives Linux `EV_KEY` codes. On Android, including Nook readers, KOReader receives Android keycodes instead, which use different numbers for the same letters; the plugin detects Android and uses the Android column below. **Button assignments** shows the code your reader actually receives. Android sends a held button as repeated presses, and the plugin ignores those just as it ignores Linux key repeats.
+Built for KOReader **2026.07.1**; newer releases are expected to work but have not been tested. Tested on real hardware:
+
+| Remote | PocketBook Era Lite (Linux) | Nook (Android) |
+| --- | --- | --- |
+| 8BitDo Zero 2 | Tested | Tested |
+| 8BitDo Micro | Not yet tested | Tested |
+
+Other KOReader devices, including other Android readers such as Boox, should work the same way but have not been tested. On Linux-based readers (PocketBook, Kobo, Kindle and similar), KOReader receives Linux `EV_KEY` codes. On Android, including Nook readers, KOReader receives Android keycodes instead, which use different numbers for the same letters; the plugin detects Android and uses the Android column below. **Button assignments** shows the code your reader actually receives. Android sends a held button as repeated presses, and the plugin ignores those just as it ignores Linux key repeats.
 
 ## Zero 2 defaults
 
@@ -43,9 +50,9 @@ Tested on a PocketBook Era Lite with the Zero 2. On Linux-based readers (PocketB
 
 ## Micro defaults
 
-The screenshot's keyboard letters are translated into Linux `EV_KEY` codes, checked against `linux/input-event-codes.h`. These are Linux codes, not numeric USB HID usage IDs.
+In keyboard mode, both remotes send the same keyboard letters for the buttons they share. The codes below are the Linux `EV_KEY` and Android keycodes for those letters, not numeric USB HID usage IDs.
 
-| Micro button | Screenshot key | Linux code | Android keycode | Default assignment |
+| Micro button | Keyboard letter | Linux code | Android keycode | Default assignment |
 | --- | --- | ---: | ---: | --- |
 | D-pad up | C | 46 | 31 | Up |
 | D-pad down | D | 32 | 32 | Down |
@@ -62,9 +69,9 @@ The screenshot's keyboard letters are translated into Linux `EV_KEY` codes, chec
 | Y | I | 23 | 37 | Previous page |
 | B | J | 36 | 38 | Back |
 | Capture (checkerboard) | S | 31 | 47 | Ignore button |
-| Star | Null | — | — | No keyboard event to map |
+| Star | None | — | — | No keyboard event to map |
 
-Micro's Star button has no keyboard event in the supplied profile and is omitted from the menu. Capture defaults to Ignore button and can be reassigned. If you customized Micro's keyboard profile, restore the listed letters before using this mapping.
+Micro's Star button sends no keyboard event in keyboard mode and is omitted from the menu. Capture defaults to Ignore button and can be reassigned. If you customized the Micro's keyboard mapping with 8BitDo's software, restore the listed letters before using this plugin.
 
 ## Available assignments
 
@@ -76,16 +83,15 @@ Selecting an action in this picker replaces that button's native key assignment.
 
 Action availability follows your KOReader version, device capabilities, enabled plugins, and current document or file-browser context. A button supplies no touch position or swipe distance, so touch-location actions cannot reproduce a tap at a particular screen coordinate. Use explicit numeric amounts for incremental actions. Gesture-specific controls such as “Always active” govern touch recognition and do not apply to remote buttons.
 
-
 Holding a button does not repeat it: each press acts once, including custom actions. Assignments and preferences are saved automatically with KOReader's global settings.
 
 ## Requirements and troubleshooting
 
-Your operating system and KOReader's input integration must already deliver the remote's key events (Linux `EV_KEY` codes, or Android keycodes on Android). This plugin maps those events; it does not pair Bluetooth devices, enable Bluetooth, install drivers, or open `/dev/input/event*` devices. Android key codes and gamepad axis events are different formats.
+Your operating system and KOReader's input integration must already deliver the remote's key events (Linux `EV_KEY` codes, or Android keycodes on Android). This plugin maps those events; it does not pair Bluetooth devices, enable Bluetooth, install drivers, or open `/dev/input/event*` devices. Game-controller buttons and joystick axes are not supported; use keyboard mode.
 
 Mappings are global and also affect physical keyboards sending the same codes. Disable **Enable remote mappings** when typing on a physical keyboard. Unrelated codes, touch input, and power buttons pass through unchanged.
 
-If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v0.7.3**. Do not extract into another `eightbitdo.koplugin` folder.
+If nothing works, verify keyboard mode, Bluetooth connection, and input delivery to KOReader. If up/down or X/B are reversed, check the selected remote. If the plugin menu is missing, check folder nesting, Plugin management, and KOReader's `crash.log`. **Help** shows the installed build, for example **v1.0.0**. Do not extract into another `eightbitdo.koplugin` folder.
 
 To uninstall, exit KOReader, remove `plugins/eightbitdo.koplugin`, then restart. The saved settings are harmless; optionally remove `eightbitdo_remotes` from `settings.reader.lua` while KOReader is closed.
 
@@ -98,7 +104,7 @@ luajit tests/run.lua
 luajit tests/run.lua micro
 ```
 
-Tests stub KOReader services and exercise mappings, press/release, repeat suppression, menus, settings persistence, profile switching, migration, event-map replacement, reader/file-manager lifecycle, the full tap-corner action picker, multiple action selections, custom action routing, returning to the native key when the last action is unchecked, keyboard connect/disconnect signals, translatable labels, numeric arguments, QuickMenus, action sequences, and reset. Actual Bluetooth delivery and reader/menu behavior still require hardware testing.
+Tests stub KOReader services and exercise mappings, press/release, repeat suppression, menus, settings persistence, profile switching, migration, event-map replacement, reader/file-manager lifecycle, the full tap-corner action picker, multiple action selections, custom action routing, returning to the native key when the last action is unchecked, keyboard connect/disconnect signals, Android keycodes, translatable labels, numeric arguments, QuickMenus, action sequences, and reset. Actual Bluetooth delivery and reader/menu behavior still require hardware testing.
 
 Check everything and build the installation archives in `dist/`:
 
@@ -109,4 +115,8 @@ scripts/build.sh --check  # checks only; CI runs this on every push
 
 The implementation follows KOReader's [input hook and key translation API](https://github.com/koreader/koreader/blob/v2026.07.1/frontend/device/input.lua) and [External Keyboard connection notifications](https://github.com/koreader/koreader/blob/v2026.07.1/plugins/externalkeyboard.koplugin/main.lua).
 
-Gesture assignments follow KOReader's [Dispatcher action picker and execution API](https://github.com/koreader/koreader/blob/master/frontend/dispatcher.lua), with key bindings handled through [InputContainer](https://github.com/koreader/koreader/blob/master/frontend/ui/widget/container/inputcontainer.lua).
+Gesture assignments follow KOReader's [Dispatcher action picker and execution API](https://github.com/koreader/koreader/blob/v2026.07.1/frontend/dispatcher.lua), with key bindings handled through [InputContainer](https://github.com/koreader/koreader/blob/v2026.07.1/frontend/ui/widget/container/inputcontainer.lua).
+
+## License
+
+Licensed under the [GNU Affero General Public License v3.0](LICENSE), the same license as KOReader. The plugin package includes a copy of the license.

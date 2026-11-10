@@ -6,6 +6,20 @@ and versions follow [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [1.0.0] - 2026-11-10
+
+First public release.
+
+### Added
+
+- The plugin package includes the AGPL-3.0 license.
+- The README lists the KOReader release the plugin is built for and which
+  remotes have been tested on which readers.
+
+### Changed
+
+- README wording no longer refers to internal history, describes keyboard
+  letters directly, and points KOReader source links at 2026.07.1.
 ## [0.7.3] - 2026-11-10
 
 ### Fixed
@@ -112,6 +126,7 @@ and versions follow [Semantic Versioning](https://semver.org/).
   their settings untouched.
 - The build number in **8BitDo remotes → Help**.
 
+[1.0.0]: dist/eightbitdo-1.0.0.koplugin.zip
 [0.7.3]: dist/eightbitdo-0.7.3.koplugin.zip
 [0.7.2]: dist/eightbitdo-0.7.2.koplugin.zip
 [0.7.1]: dist/eightbitdo-0.7.1.koplugin.zip

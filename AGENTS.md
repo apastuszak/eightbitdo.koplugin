@@ -34,6 +34,7 @@ limitations honestly instead of inventing gesture coordinates.
 - `tests/run.lua`: standalone LuaJIT regression suite with KOReader service stubs.
 - `dist/`: installable archives containing a single `eightbitdo.koplugin/` folder.
 - `LICENSE`: GNU AGPL-3.0, matching KOReader. Keep the text verbatim.
+- `eightbitdo.koplugin/LICENSE`: packaged copy of `LICENSE`; keep them identical.
 - `CHANGELOG.md`: user-facing release notes in Keep a Changelog format.
 - `scripts/build.sh`: runs every check and builds `dist/` archives; with
   `--check` it only verifies (used by CI).

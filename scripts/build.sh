@@ -44,6 +44,7 @@ grep -qF "**v$version**" README.md || fail "README.md does not mention **v$versi
 grep -qF "\"v$version\"" tests/run.lua || fail "tests/run.lua does not check Help for v$version"
 grep -qF "## [$version]" CHANGELOG.md || fail "CHANGELOG.md has no [$version] section"
 cmp -s README.md "$PLUGIN/README.md" || fail "README.md and $PLUGIN/README.md differ"
+cmp -s LICENSE "$PLUGIN/LICENSE" || fail "LICENSE and $PLUGIN/LICENSE differ"
 
 step "Checking plugin folder contents"
 stray=$(find "$PLUGIN" \( -name '*.luac' -o -name '.*' \) -print)
